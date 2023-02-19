@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/emmicourt/TaskAssertions#readme",
   "dependencies": {
-    "azure-pipelines-task-lib": "^4.2.0"
+    "azure-pipelines-task-lib": "^4.2.0",
+    "tsc": "^2.0.4"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.1",
