@@ -4,7 +4,8 @@
   "description": "A custom azure dev ops task to help test and validate other tasks.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha buildandreleasetask/tests/_suite.js",
+    "clean": "find . -type f -name '*.js' -delete"
   },
   "repository": {
     "type": "git",
