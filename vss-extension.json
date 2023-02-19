@@ -14,11 +14,11 @@
         "Azure Pipelines"
     ],
     "icons": {
-        "default": "images/extension-icon.png"        
+        "default": "./images/extension-icon.png"        
     },
     "files": [
         {
-            "path": "buildandreleasetask"
+            "path": "./dist/"
         }
     ],
     "contributions": [
@@ -29,7 +29,7 @@
                 "ms.vss-distributed-task.tasks"
             ],
             "properties": {
-                "name": "buildandreleasetask"
+                "name": "task-assertions"
             }
         }
     ]

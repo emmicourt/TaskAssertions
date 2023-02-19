@@ -2,10 +2,11 @@
   "name": "taskassertions",
   "version": "1.0.0",
   "description": "A custom azure dev ops task to help test and validate other tasks.",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "test": "mocha buildandreleasetask/tests/_suite.js",
-    "clean": "find . -type f -name '*.js' -delete"
+    "test": "mocha dist/tests/_suite.js",
+    "clean": "find . -type f -name '*.js' -delete; rm -rf dist/*",
+    "pack": "tfx extension create --manifest-globs vss-extension.json"
   },
   "repository": {
     "type": "git",
