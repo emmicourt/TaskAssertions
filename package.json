@@ -1,0 +1,29 @@
+{
+  "name": "taskassertions",
+  "version": "1.0.0",
+  "description": "A custom azure dev ops task to help test and validate other tasks.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emmicourt/TaskAssertions.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/emmicourt/TaskAssertions/issues"
+  },
+  "homepage": "https://github.com/emmicourt/TaskAssertions#readme",
+  "dependencies": {
+    "azure-pipelines-task-lib": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.14.0",
+    "@types/q": "^1.5.5",
+    "sync-request": "^6.1.0"
+  }
+}
