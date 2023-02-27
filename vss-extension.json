@@ -1,36 +1,32 @@
 {
-    "manifestVersion": 1,
-    "id": "task-assertions",
-    "name": "TaskAssertions",
-    "version": "0.0.1",
-    "publisher": "emmicourt",
-    "targets": [
-        {
-            "id": "Microsoft.VisualStudio.Services"
-        }
-    ],    
-    "description": "A task to help test and validate other tasks results and outputs.",
-    "categories": [
-        "Azure Pipelines"
-    ],
-    "icons": {
-        "default": "./images/extension-icon.png"        
-    },
-    "files": [
-        {
-            "path": "./dist/"
-        }
-    ],
-    "contributions": [
-        {
-            "id": "custom-build-release-task",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "task-assertions"
-            }
-        }
-    ]
+  "manifestVersion": 1,
+  "id": "task-assertions",
+  "name": "TaskAssertions",
+  "version": "0.0.1",
+  "publisher": "emmicourt",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "A task to help test and validate other tasks results and outputs.",
+  "categories": ["Azure Pipelines"],
+  "icons": {
+    "default": "./images/extension-icon.png"
+  },
+  "files": [
+    {
+      "path": "./dist/"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "custom-build-release-task",
+      "type": "ms.vss-distributed-task.task",
+      "targets": ["ms.vss-distributed-task.tasks"],
+      "properties": {
+        "name": "task-assertions"
+      }
+    }
+  ]
 }

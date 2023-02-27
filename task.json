@@ -1,31 +1,31 @@
 {
-    "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
-    "id": "9e8adde4-812d-41ba-bb12-1a3aeab8a389",
-    "name": "task-assertions",
-    "friendlyName": "Task Assertions",
-    "description": "A task to help test and validate the result of other tasks.",
-    "helpMarkDown": "",
-    "category": "Utility",
-    "author": "emmicourt@gmail.com",
-    "version": {
-        "Major": 0,
-        "Minor": 1,
-        "Patch": 0
-    },
-    "instanceNameFormat": "Echo $(samplestring)",
-    "inputs": [
-        {
-            "name": "samplestring",
-            "type": "string",
-            "label": "Sample String",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "A sample string"
-        }
-    ],
-    "execution": {
-        "Node": {
-            "target": "index.js"
-        }
+  "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+  "id": "9e8adde4-812d-41ba-bb12-1a3aeab8a389",
+  "name": "task-assertions",
+  "friendlyName": "Task Assertions",
+  "description": "A task to help test and validate the result of other tasks.",
+  "helpMarkDown": "",
+  "category": "Utility",
+  "author": "emmicourt@gmail.com",
+  "version": {
+    "Major": 0,
+    "Minor": 1,
+    "Patch": 0
+  },
+  "instanceNameFormat": "Echo $(samplestring)",
+  "inputs": [
+    {
+      "name": "samplestring",
+      "type": "string",
+      "label": "Sample String",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "A sample string"
     }
+  ],
+  "execution": {
+    "Node": {
+      "target": "index.js"
+    }
+  }
 }

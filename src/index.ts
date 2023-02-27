@@ -1,19 +1,15 @@
-import tl = require('azure-pipelines-task-lib/task');
+import tl = require("azure-pipelines-task-lib/task");
 
-async function run() {
-    try {
-        const inputString: string | undefined = tl.getInput('samplestring', true);
-        if (inputString == 'bad') {
-            tl.setResult(tl.TaskResult.Failed, 'Bad input was given');
-            return;
-        }
-        console.log('Hello', inputString);
+export async function run() {
+  try {
+    const inputString: string | undefined = tl.getInput("samplestring", true);
+
+    console.log("Hello", inputString);
+  } catch (err) {
+    if (err instanceof Error) {
+      tl.setResult(tl.TaskResult.Failed, err.message);
     }
-    catch (err) {
-        if(err instanceof Error){
-            tl.setResult(tl.TaskResult.Failed, err.message);   
-        }
-    }
+  }
 }
 
 run();
