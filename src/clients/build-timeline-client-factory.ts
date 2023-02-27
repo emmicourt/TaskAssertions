@@ -1,5 +1,8 @@
 import * as vm from "azure-devops-node-api";
-import { BuildTimelineClient, IBuildTimelineClient } from "./build-timeline-client";
+import {
+  BuildTimelineClient,
+  IBuildTimelineClient,
+} from "./build-timeline-client";
 
 export class BuildTimelineClientFactory {
   constructor() {}
@@ -8,9 +11,9 @@ export class BuildTimelineClientFactory {
     adoUrl: string,
     token: string
   ): Promise<IBuildTimelineClient> {
-    let authHandler = vm.getPersonalAccessTokenHandler(token);
-    let vsoClient = new vm.WebApi(adoUrl, authHandler, undefined);
-    let buildApi = await vsoClient.getBuildApi();
+    const authHandler = vm.getPersonalAccessTokenHandler(token);
+    const vsoClient = new vm.WebApi(adoUrl, authHandler, undefined);
+    const buildApi = await vsoClient.getBuildApi();
 
     return new BuildTimelineClient(buildApi);
   }
