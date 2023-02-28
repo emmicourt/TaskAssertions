@@ -33,6 +33,10 @@ export class BuildTaskRunService implements IBuildTaskRunService {
     );
     const taskRecord = this.getTaskTimelineRecord(buildTimeline, jobId, taskId);
 
+    if(!taskRecord){
+      return undefined;
+    }
+
     return this.mapTimelineToTaskRun(taskRecord, buildId);
   }
 

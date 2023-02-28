@@ -39,6 +39,22 @@ describe("build task run service ", () => {
     expect(result.jobId).toBe(jobId);
     expect(result.taskId).toBe(taskId);
   });
+
+  it("should return undefined if task not found ",async () => {
+    const jobId = "someJobId";
+    const taskId = "someOtherTaskId";
+    const buildId = "someBuildId";
+    const project = "someProject";
+
+    const result = await buildTaskRunService.getBuildTaskRun(
+      project,
+      buildId,
+      jobId,
+      taskId
+    );
+
+    expect(result).toBeUndefined();
+  });
 });
 
 function createTestTimeline(): Timeline {
