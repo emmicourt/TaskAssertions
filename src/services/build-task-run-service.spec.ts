@@ -1,25 +1,57 @@
-
-import { BuildTimelineClient, IBuildTimelineClient } from "../clients/build-timeline-client";
+import {
+  TaskResult,
+  Timeline,
+} from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { BuildTaskRunService } from "./build-task-run-service";
-jest.mock('../clients/build-timeline-client');
 
 describe("build task run service ", () => {
-
-  const buildClientMock = <jest.Mock<IBuildTimelineClient>><unknown>BuildTimelineClient;
-  const buildTaskRunService = new BuildTaskRunService(buildClientMock());
+  const getBuildTimelineMock = jest.fn(
+    (): Promise<Timeline | undefined> => Promise.resolve(createTestTimeline())
+  );
+  const buildTimelineClientMock = jest.fn().mockImplementation(() => {
+    return {
+      getBuildTimeline: getBuildTimelineMock,
+    };
+  });
+  const buildTImelineClient = new buildTimelineClientMock();
+  const buildTaskRunService = new BuildTaskRunService(buildTImelineClient);
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should throw unimplemented", async () => {
-    let errorMessage :string;
-    try{
-        buildTaskRunService.getBuildTaskRun("someProjectName", "someBuildId", "someJobId", "someTaskId");
-    } catch (err){
-        errorMessage = err.message;
-    }
+  it("should get build task run", async () => {
+    const jobId = "someJobId";
+    const taskId = "someTaskId";
+    const buildId = "someBuildId";
+    const project = "someProject";
 
-    expect(errorMessage).toBe("Method not implemented.");
+    const result = await buildTaskRunService.getBuildTaskRun(
+      project,
+      buildId,
+      jobId,
+      taskId
+    );
+
+    expect(result).not.toBeNull();
+    expect(result.buildId).toBe(buildId);
+    expect(result.errorCount).toBe(0);
+    expect(result.jobId).toBe(jobId);
+    expect(result.taskId).toBe(taskId);
   });
 });
+
+function createTestTimeline(): Timeline {
+  return {
+    records: [
+      {
+        parentId: "someJobId",
+        type: "Task",
+        task: { id: "someTaskId", name: "someTaskName" },
+        errorCount: 0,
+        warningCount: 0,
+        result: TaskResult.Succeeded,
+      },
+    ],
+  };
+}

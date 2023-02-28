@@ -5,6 +5,6 @@ module.exports = {
   plugins: ["@typescript-eslint"],
   root: true,
   rules: {
-    'no-empty-function': ["error", { "allow": ["constructors"] }]
-  }
+    "no-empty-function": ["error", { allow: ["constructors"] }],
+  },
 };
