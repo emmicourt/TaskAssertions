@@ -3,8 +3,10 @@ import {
   TimelineRecord,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IBuildTimelineClient } from "../clients/build-timeline-client";
-import { BuildTaskRunServiceError } from "../contracts/build-service-error";
+import { BuildTaskRunServiceError } from "../contracts/build-task-run-service-error";
 import { BuildTaskRun } from "../contracts/build-task-run";
+import { IsNullOrWhitespace } from "../common/string-utils";
+import { BuildTaskRunServiceInputValidationError } from "../contracts/build-task-run-service-input-validation-error";
 
 export interface IBuildTaskRunService {
   getBuildTaskRun(
@@ -28,6 +30,12 @@ export class BuildTaskRunService implements IBuildTaskRunService {
     jobId: string,
     taskId: string
   ): Promise<BuildTaskRun | undefined> {
+    this.validateInputParameters([
+      ["taskId", taskId, IsNullOrWhitespace],
+      ["jobId", jobId, IsNullOrWhitespace],
+      ["projectName", projectName, IsNullOrWhitespace],
+      ["buildId", buildId, IsNullOrWhitespace],
+    ]);
     try {
       const buildTimeline = await this.buildTimelineClient.getBuildTimeline(
         projectName,
@@ -74,5 +82,19 @@ export class BuildTaskRunService implements IBuildTaskRunService {
       errorCount: timelineRecord.errorCount,
       warningCount: timelineRecord.warningCount,
     };
+  }
+
+  private validateInputParameters(
+    inputs: [
+      parameterName: string,
+      parameterValue: unknown,
+      rule: (value: unknown) => boolean
+    ][]
+  ): void {
+    inputs.forEach(([name, value, rule]) => {
+      if (rule(value)) {
+        throw new BuildTaskRunServiceInputValidationError(name, value);
+      }
+    });
   }
 }
