@@ -3,6 +3,7 @@ import {
   TimelineRecord,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IBuildTimelineClient } from "../clients/build-timeline-client";
+import { BuildTaskRunServiceError } from "../contracts/build-service-error";
 import { BuildTaskRun } from "../contracts/build-task-run";
 
 export interface IBuildTaskRunService {
@@ -27,17 +28,25 @@ export class BuildTaskRunService implements IBuildTaskRunService {
     jobId: string,
     taskId: string
   ): Promise<BuildTaskRun | undefined> {
-    const buildTimeline = await this.buildTimelineClient.getBuildTimeline(
-      projectName,
-      parseInt(buildId)
-    );
-    const taskRecord = this.getTaskTimelineRecord(buildTimeline, jobId, taskId);
+    try {
+      const buildTimeline = await this.buildTimelineClient.getBuildTimeline(
+        projectName,
+        parseInt(buildId)
+      );
+      const taskRecord = this.getTaskTimelineRecord(
+        buildTimeline,
+        jobId,
+        taskId
+      );
 
-    if(!taskRecord){
-      return undefined;
+      if (!taskRecord) {
+        return undefined;
+      }
+
+      return this.mapTimelineToTaskRun(taskRecord, buildId);
+    } catch (error) {
+      throw new BuildTaskRunServiceError(error.message);
     }
-
-    return this.mapTimelineToTaskRun(taskRecord, buildId);
   }
 
   private getTaskTimelineRecord(
