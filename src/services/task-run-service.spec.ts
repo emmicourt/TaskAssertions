@@ -2,8 +2,8 @@ import {
   TaskResult,
   Timeline,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { TaskRunServiceError } from "../contracts/task-run-service-error";
-import { TaskRunServiceInputValidationError } from "../contracts/task-run-service-input-validation-error";
+import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-service-error";
+import { TaskRunServiceInputValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
 import { BuildTaskRunService } from "./task-run-service";
 
 describe("TaskRunService logical tests", () => {
