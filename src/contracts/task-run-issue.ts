@@ -1,4 +1,4 @@
-export class BuildTaskRunIssue {
+export class TaskRunIssue {
   message: string;
   level: string;
 }

@@ -1,4 +1,4 @@
-export class BuildTaskRunLog {
+export class TaskRunLog {
   logId: string;
   logUrl: string;
 }

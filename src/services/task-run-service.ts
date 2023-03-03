@@ -3,10 +3,10 @@ import {
   TimelineRecord,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IBuildTimelineClient } from "../clients/build-timeline-client";
-import { BuildTaskRunServiceError } from "../contracts/build-task-run-service-error";
-import { BuildTaskRun } from "../contracts/build-task-run";
+import { TaskRunServiceError } from "../contracts/task-run-service-error";
+import { TaskRun } from "../contracts/task-run";
 import { IsNullOrWhitespace } from "../common/string-utils";
-import { BuildTaskRunServiceInputValidationError } from "../contracts/build-task-run-service-input-validation-error";
+import { TaskRunServiceInputValidationError } from "../contracts/task-run-service-input-validation-error";
 
 export interface IBuildTaskRunService {
   getBuildTaskRun(
@@ -14,7 +14,7 @@ export interface IBuildTaskRunService {
     buildId: string,
     jobId: string,
     taskId: string
-  ): Promise<BuildTaskRun | undefined>;
+  ): Promise<TaskRun | undefined>;
 }
 
 export class BuildTaskRunService implements IBuildTaskRunService {
@@ -29,7 +29,7 @@ export class BuildTaskRunService implements IBuildTaskRunService {
     buildId: string,
     jobId: string,
     taskId: string
-  ): Promise<BuildTaskRun | undefined> {
+  ): Promise<TaskRun | undefined> {
     this.validateInputParameters([
       ["taskId", taskId, IsNullOrWhitespace],
       ["jobId", jobId, IsNullOrWhitespace],
@@ -53,7 +53,7 @@ export class BuildTaskRunService implements IBuildTaskRunService {
 
       return this.mapTimelineToTaskRun(taskRecord, buildId);
     } catch (error) {
-      throw new BuildTaskRunServiceError(error.message);
+      throw new TaskRunServiceError(error.message);
     }
   }
 
@@ -73,7 +73,7 @@ export class BuildTaskRunService implements IBuildTaskRunService {
   private mapTimelineToTaskRun(
     timelineRecord: TimelineRecord,
     buildId: string
-  ): BuildTaskRun | undefined {
+  ): TaskRun | undefined {
     return {
       taskId: timelineRecord.task.id,
       taskName: timelineRecord.task.name,
@@ -93,7 +93,7 @@ export class BuildTaskRunService implements IBuildTaskRunService {
   ): void {
     inputs.forEach(([name, value, rule]) => {
       if (rule(value)) {
-        throw new BuildTaskRunServiceInputValidationError(name, value);
+        throw new TaskRunServiceInputValidationError(name, value);
       }
     });
   }

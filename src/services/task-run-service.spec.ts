@@ -2,11 +2,11 @@ import {
   TaskResult,
   Timeline,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
-import { BuildTaskRunServiceError } from "../contracts/build-task-run-service-error";
-import { BuildTaskRunServiceInputValidationError } from "../contracts/build-task-run-service-input-validation-error";
-import { BuildTaskRunService } from "./build-task-run-service";
+import { TaskRunServiceError } from "../contracts/task-run-service-error";
+import { TaskRunServiceInputValidationError } from "../contracts/task-run-service-input-validation-error";
+import { BuildTaskRunService } from "./task-run-service";
 
-describe("BuildTaskRunService logical tests", () => {
+describe("TaskRunService logical tests", () => {
   const jobId = "someJobId";
   const taskId = "someTaskId";
   const buildId = "someBuildId";
@@ -70,7 +70,7 @@ describe("BuildTaskRunService logical tests", () => {
   });
 });
 
-describe("BuildTaskRunService input validation tests", () => {
+describe("TaskRunService input validation tests", () => {
   const jobId = "someJobId";
   const taskId = "someTaskId";
   const buildId = "someBuildId";
@@ -105,11 +105,11 @@ describe("BuildTaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(BuildTaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter taskId cannot be ${taskId}`
       );
-      expect(error.name).toBe(BuildTaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
     }
   );
 
@@ -127,11 +127,11 @@ describe("BuildTaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(BuildTaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter jobId cannot be ${jobId}`
       );
-      expect(error.name).toBe(BuildTaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
     }
   );
 
@@ -149,11 +149,11 @@ describe("BuildTaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(BuildTaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter projectName cannot be ${projectName}`
       );
-      expect(error.name).toBe(BuildTaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
     }
   );
 
@@ -171,16 +171,16 @@ describe("BuildTaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(BuildTaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter buildId cannot be ${buildId}`
       );
-      expect(error.name).toBe(BuildTaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
     }
   );
 });
 
-describe("BuildTaskRunService exception tests", () => {
+describe("TaskRunService exception tests", () => {
   const jobId = "someJobId";
   const taskId = "someTaskId";
   const buildId = "someBuildId";
@@ -219,9 +219,9 @@ describe("BuildTaskRunService exception tests", () => {
       error = resultError;
     }
 
-    expect(error).toBeInstanceOf(BuildTaskRunServiceError);
+    expect(error).toBeInstanceOf(TaskRunServiceError);
     expect(error.message).toBe(`Error getting build timeline. ${message}`);
-    expect(error.name).toBe(BuildTaskRunServiceError.name);
+    expect(error.name).toBe(TaskRunServiceError.name);
   });
 });
 

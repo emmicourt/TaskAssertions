@@ -1,6 +1,6 @@
-export class BuildTaskRunServiceInputValidationError extends Error {
+export class TaskRunServiceInputValidationError extends Error {
   constructor(parameter: string, value: unknown) {
     super(`Invalid input: parameter ${parameter} cannot be ${value}`);
-    this.name = "BuildTaskRunServiceInputValidationError";
+    this.name = "TaskRunServiceInputValidationError";
   }
 }
