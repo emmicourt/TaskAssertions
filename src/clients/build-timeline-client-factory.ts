@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import * as vm from "azure-devops-node-api";
-import { BuildTimelineClient } from "./build-timeline-client";
+import {
+  BuildTimelineClient,
+  IBuildTimelineClient,
+} from "./build-timeline-client";
 
 export class BuildTimelineClientFactory {
   constructor() {}
@@ -7,10 +11,10 @@ export class BuildTimelineClientFactory {
   public async getBuildTimelineClient(
     adoUrl: string,
     token: string
-  ): Promise<BuildTimelineClient> {
-    let authHandler = vm.getPersonalAccessTokenHandler(token);
-    let vsoClient = new vm.WebApi(adoUrl, authHandler, undefined);
-    let buildApi = await vsoClient.getBuildApi();
+  ): Promise<IBuildTimelineClient> {
+    const authHandler = vm.getPersonalAccessTokenHandler(token);
+    const vsoClient = new vm.WebApi(adoUrl, authHandler, undefined);
+    const buildApi = await vsoClient.getBuildApi();
 
     return new BuildTimelineClient(buildApi);
   }

@@ -1,10 +1,8 @@
 import tl = require("azure-pipelines-task-lib/task");
 
-export async function run() {
+export async function run(): Promise<void> {
   try {
-    const inputString: string | undefined = tl.getInput("samplestring", true);
-
-    console.log("Hello", inputString);
+    const taskId: string | undefined = tl.getInput("taskId", true);
   } catch (err) {
     if (err instanceof Error) {
       tl.setResult(tl.TaskResult.Failed, err.message);
