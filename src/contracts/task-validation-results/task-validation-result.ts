@@ -1,12 +1,12 @@
 
-export enum TaskValidationResult {
+export enum  TaskValidationResult{
     Succeeded,
     Failed
 }
 
-export class TaskValidation{
+export class TaskValidationReport{
     taskId: string;
     taskName: string;
     result: TaskValidationResult;
-    message: string;
+    messages: string[];
 }
