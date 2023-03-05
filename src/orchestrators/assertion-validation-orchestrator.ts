@@ -45,7 +45,7 @@ export class AssertionValidationOrchestrator
         ],
         [
           "expectedWarningCount",
-          assertion.expectedErrorCount,
+          assertion.expectedWarningCount,
           this.IsNonNaturalNumber,
         ],
       ]);
