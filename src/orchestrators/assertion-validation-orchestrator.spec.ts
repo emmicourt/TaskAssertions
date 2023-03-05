@@ -1,7 +1,6 @@
 import { Assertion } from "../contracts/assertions/assertion";
 import { TaskRun } from "../contracts/task-runs/task-run";
 import tl = require("azure-pipelines-task-lib/task");
-import { TaskConfig } from "../common/task-config";
 import { AssertionValidationError } from "../contracts/assertions/exceptions/assertion-validation-error";
 import { InvalidAssertionError } from "../contracts/assertions/exceptions/invalid-assertion-error";
 import { AssertionValidationOrchestrator } from "./assertion-validation-orchestrator";
@@ -22,7 +21,6 @@ describe("AssertionValidationOrchestrator logical tests", () => {
   const taskValidationOrchestrator = new AssertionValidationOrchestrator(
     taskRunService
   );
-  const taskConfig = new TaskConfig();
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -31,7 +29,6 @@ describe("AssertionValidationOrchestrator logical tests", () => {
   it("should return success validation if assertion is true", async () => {
     const assertion: Assertion = createAssertion();
     const result = await taskValidationOrchestrator.checkAssertions(
-      taskConfig,
       assertion
     );
 
@@ -57,7 +54,6 @@ describe("AssertionValidationOrchestrator validation tests", () => {
   const taskValidationOrchestrator = new AssertionValidationOrchestrator(
     taskRunService
   );
-  const taskConfig = new TaskConfig();
 
   test.each([undefined, null, "", " "])(
     "Input: assertion.taskId Value: %p throw error",
@@ -67,7 +63,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       let error: AssertionValidationError;
 
       try {
-        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+        await taskValidationOrchestrator.checkAssertions(assertion);
       } catch (err) {
         error = err;
       }
@@ -80,6 +76,69 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     }
   );
 
+  test.each([undefined, null, "", " "])(
+    "Input: assertion.jobId Value: %p throw error",
+    async (jobId) => {
+      const assertion: Assertion = createAssertion();
+      assertion.jobId = jobId;
+      let error: AssertionValidationError;
+
+      try {
+        await taskValidationOrchestrator.checkAssertions(assertion);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeInstanceOf(AssertionValidationError);
+      expect(error.innerException).toBeInstanceOf(InvalidAssertionError);
+      expect(error.message).toBe(`Invalid Assertion.`);
+      expect(error.innerException.message).toBe(
+        `Invalid Assertion. Parameter name jobId Parameter value: ${jobId}`
+      );
+    }
+  );
+
+  test.each([undefined, null, "", " "])(
+    "Input: assertion.projectName Value: %p throw error",
+    async (projectName) => {
+      const assertion: Assertion = createAssertion();
+      assertion.projectName = projectName;
+      let error: AssertionValidationError;
+
+      try {
+        await taskValidationOrchestrator.checkAssertions(assertion);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeInstanceOf(AssertionValidationError);
+      expect(error.innerException).toBeInstanceOf(InvalidAssertionError);
+      expect(error.message).toBe(`Invalid Assertion.`);
+      expect(error.innerException.message).toBe(
+        `Invalid Assertion. Parameter name projectName Parameter value: ${projectName}`
+      );
+    }
+  );
+
+  test.each([undefined, null, "", " "])(
+    "Input: assertion.buildId Value: %p throw error",
+    async (buildId) => {
+      const assertion: Assertion = createAssertion();
+      assertion.buildId = buildId;
+      let error: AssertionValidationError;
+
+      try {
+        await taskValidationOrchestrator.checkAssertions(assertion);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeInstanceOf(AssertionValidationError);
+      expect(error.innerException).toBeInstanceOf(InvalidAssertionError);
+      expect(error.message).toBe(`Invalid Assertion.`);
+      expect(error.innerException.message).toBe(
+        `Invalid Assertion. Parameter name buildId Parameter value: ${buildId}`
+      );
+    }
+  );
+
   test.each([-1, 0.5])(
     "Input: assertion.expectedErrorCount Value: %p throw error",
     async (expectedErrorCount) => {
@@ -88,7 +147,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       let error: AssertionValidationError;
 
       try {
-        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+        await taskValidationOrchestrator.checkAssertions(assertion);
       } catch (err) {
         error = err;
       }
@@ -109,7 +168,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       let error: AssertionValidationError;
 
       try {
-        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+        await taskValidationOrchestrator.checkAssertions(assertion);
       } catch (err) {
         error = err;
       }
@@ -130,7 +189,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       let error: AssertionValidationError;
 
       try {
-        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+        await taskValidationOrchestrator.checkAssertions(assertion);
       } catch (err) {
         error = err;
       }
@@ -151,7 +210,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       let error: AssertionValidationError;
 
       try {
-        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+        await taskValidationOrchestrator.checkAssertions(assertion);
       } catch (err) {
         error = err;
       }
@@ -170,7 +229,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       let error: AssertionValidationError;
 
       try {
-        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+        await taskValidationOrchestrator.checkAssertions(assertion);
       } catch (err) {
         error = err;
       }
@@ -187,6 +246,9 @@ describe("AssertionValidationOrchestrator validation tests", () => {
 function createAssertion(): Assertion {
   return {
     taskId: "someTaskId",
+    projectName: "someProjectName",
+    jobId: "someJobId",
+    buildId: "someBuildId",
     expectedTaskResult: tl.TaskResult.Succeeded,
     expectedErrorCount: 0,
     expectedWarningCount: 0,

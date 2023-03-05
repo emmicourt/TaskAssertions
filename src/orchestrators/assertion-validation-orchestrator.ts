@@ -1,5 +1,4 @@
 import { IsNullOrWhitespace } from "../common/string-utils";
-import { TaskConfig } from "../common/task-config";
 import {
   AssertionValidationReport,
   AssertionValidationResult,
@@ -10,10 +9,10 @@ import { InvalidAssertionError } from "../contracts/assertions/exceptions/invali
 import { NullAssertionError } from "../contracts/assertions/exceptions/null-assertion-error";
 import { TaskRun } from "../contracts/task-runs/task-run";
 import { ITaskRunService } from "../services/task-run-service";
+import { AssertionValidationOrchestratorError } from "./exception/assertion-validation-orchestrator-error";
 
 export interface IAssertionValidationOrchestrator {
   checkAssertions(
-    taskConfig: TaskConfig,
     assertion: Assertion
   ): Promise<AssertionValidationReport>;
 }
@@ -28,19 +27,15 @@ export class AssertionValidationOrchestrator
   }
 
   public async checkAssertions(
-    taskConfig: TaskConfig,
     assertion: Assertion
   ): Promise<AssertionValidationReport> {
     try {
-      const projectName = taskConfig.getProjectName();
-      const jobId = taskConfig.getJobId();
-      const buildId = taskConfig.getBuildId();
       this.validateAssertion(assertion);
 
       const taskRun = await this.taskRunService.getBuildTaskRun(
-        projectName,
-        buildId,
-        jobId,
+        assertion.projectName,
+        assertion.buildId,
+        assertion.jobId,
         assertion.taskId
       );
 
@@ -85,6 +80,9 @@ export class AssertionValidationOrchestrator
     }
     this.validate([
       ["taskId", assertion.taskId, IsNullOrWhitespace],
+      ["jobId", assertion.jobId, IsNullOrWhitespace],
+      ["buildId", assertion.buildId, IsNullOrWhitespace],
+      ["projectName", assertion.projectName, IsNullOrWhitespace],
       [
         "expectedErrorCount",
         assertion.expectedErrorCount,
@@ -135,7 +133,7 @@ export class AssertionValidationOrchestrator
       case NullAssertionError.name:
         throw new AssertionValidationError(err);
       default:
-        throw err;
+        throw new AssertionValidationOrchestratorError(err.message);
     }
   }
 }
