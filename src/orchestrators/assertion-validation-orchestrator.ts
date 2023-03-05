@@ -5,16 +5,14 @@ import {
 } from "../contracts/assertion-validation-results/assertion-validation-result";
 import { Assertion } from "../contracts/assertions/assertion";
 import { AssertionValidationError } from "../contracts/assertions/exceptions/assertion-validation-error";
+import { AssertionValidationOrchestratorError } from "../contracts/assertions/exceptions/assertion-validation-orchestrator-error";
 import { InvalidAssertionError } from "../contracts/assertions/exceptions/invalid-assertion-error";
 import { NullAssertionError } from "../contracts/assertions/exceptions/null-assertion-error";
 import { TaskRun } from "../contracts/task-runs/task-run";
 import { ITaskRunService } from "../services/task-run-service";
-import { AssertionValidationOrchestratorError } from "./exception/assertion-validation-orchestrator-error";
 
 export interface IAssertionValidationOrchestrator {
-  checkAssertions(
-    assertion: Assertion
-  ): Promise<AssertionValidationReport>;
+  checkAssertions(assertion: Assertion): Promise<AssertionValidationReport>;
 }
 
 export class AssertionValidationOrchestrator
@@ -133,7 +131,7 @@ export class AssertionValidationOrchestrator
       case NullAssertionError.name:
         throw new AssertionValidationError(err);
       default:
-        throw new AssertionValidationOrchestratorError(err.message);
+        throw new AssertionValidationOrchestratorError(err);
     }
   }
 }

@@ -6,6 +6,7 @@ import { InvalidAssertionError } from "../contracts/assertions/exceptions/invali
 import { AssertionValidationOrchestrator } from "./assertion-validation-orchestrator";
 import { AssertionValidationResult } from "../contracts/assertion-validation-results/assertion-validation-result";
 import { NullAssertionError } from "../contracts/assertions/exceptions/null-assertion-error";
+import { AssertionValidationOrchestratorError } from "../contracts/assertions/exceptions/assertion-validation-orchestrator-error";
 
 describe("AssertionValidationOrchestrator logical tests", () => {
   const getBuildTaskRun = jest.fn(
@@ -28,9 +29,7 @@ describe("AssertionValidationOrchestrator logical tests", () => {
 
   it("should return success validation if assertion is true", async () => {
     const assertion: Assertion = createAssertion();
-    const result = await taskValidationOrchestrator.checkAssertions(
-      assertion
-    );
+    const result = await taskValidationOrchestrator.checkAssertions(assertion);
 
     expect(result).not.toBeNull();
     expect(result.messages).not.toBeNull();
@@ -241,6 +240,43 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       );
     }
   );
+});
+
+describe("AssertionValidationOrchestrator exception tests", () => {
+  const getBuildTaskRun = jest.fn(
+    (): Promise<TaskRun | undefined> => Promise.resolve(createTaskRun())
+  );
+
+  const taskRunServiceMock = jest.fn().mockImplementation(() => {
+    return {
+      getBuildTaskRun: getBuildTaskRun,
+    };
+  });
+  const taskRunService = new taskRunServiceMock();
+  const taskValidationOrchestrator = new AssertionValidationOrchestrator(
+    taskRunService
+  );
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("TaskServiceFailure should throw AssertionValidation error", async () => {
+    taskRunService.getBuildTaskRun = jest.fn().mockImplementation(() => {
+        throw Error("some error message");
+      });
+    let error: AssertionValidationOrchestratorError;
+    try {
+      await taskValidationOrchestrator.checkAssertions(createAssertion());
+    } catch (err) {
+      error = err;
+    }
+    expect(error).toBeInstanceOf(AssertionValidationOrchestratorError);
+    expect(error.message).toBe(`An internal error has occured.`);
+    expect(error.innerException.message).toBe(
+      "some error message"
+    );
+  });
 });
 
 function createAssertion(): Assertion {
