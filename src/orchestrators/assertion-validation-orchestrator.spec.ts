@@ -37,6 +37,70 @@ describe("AssertionValidationOrchestrator logical tests", () => {
     expect(result.taskId).toBe(assertion.taskId);
     expect(result.result).toBe(AssertionValidationResult.Succeeded);
   });
+
+  it("should return failed validation if error count does not match assertion", async () => {
+    const assertion: Assertion = createAssertion();
+    assertion.expectedErrorCount = 5;
+    const result = await taskValidationOrchestrator.checkAssertions(assertion);
+    expect(result).not.toBeNull();
+    expect(result.messages.length).toBe(1);
+    expect(result.messages[0]).toBe(
+      `Expected error count: ${assertion.expectedErrorCount} Recieved: 0`
+    );
+    expect(result.taskId).toBe(assertion.taskId);
+    expect(result.result).toBe(AssertionValidationResult.Failed);
+  });
+
+  it("should return failed validation if warning count does not match assertion", async () => {
+    const assertion: Assertion = createAssertion();
+    assertion.expectedWarningCount = 5;
+    const result = await taskValidationOrchestrator.checkAssertions(assertion);
+    expect(result).not.toBeNull();
+    expect(result.messages.length).toBe(1);
+    expect(result.messages[0]).toBe(
+      `Expected warning count: ${assertion.expectedWarningCount} Recieved: 0`
+    );
+    expect(result.taskId).toBe(assertion.taskId);
+    expect(result.result).toBe(AssertionValidationResult.Failed);
+  });
+
+  it("should return failed validation if taskResult does not match assertion", async () => {
+    const assertion: Assertion = createAssertion();
+    assertion.expectedTaskResult = tl.TaskResult.Failed;
+    const result = await taskValidationOrchestrator.checkAssertions(assertion);
+    expect(result).not.toBeNull();
+    expect(result.messages.length).toBe(1);
+    expect(result.messages[0]).toBe(
+      `Expected task result: ${assertion.expectedTaskResult} Recieved: ${tl.TaskResult.Succeeded}`
+    );
+    expect(result.taskId).toBe(assertion.taskId);
+    expect(result.result).toBe(AssertionValidationResult.Failed);
+  });
+
+  it("should return failed validation if multiple do not match assertion", async () => {
+    const assertion: Assertion = createAssertion();
+    assertion.expectedErrorCount = 5;
+    assertion.expectedWarningCount = 5;
+    assertion.expectedTaskResult = tl.TaskResult.Failed;
+    const result = await taskValidationOrchestrator.checkAssertions(assertion);
+    expect(result).not.toBeNull();
+    expect(result.messages.length).toBe(3);
+    expect(result.messages).toContain(
+      `Expected task result: ${assertion.expectedTaskResult} Recieved: ${tl.TaskResult.Succeeded}`
+    );
+    expect(result.messages).toContain(
+      `Expected error count: ${
+        assertion.expectedErrorCount
+      } Recieved: ${0}`
+    );
+    expect(result.messages).toContain(
+      `Expected warning count: ${
+        assertion.expectedWarningCount
+      } Recieved: ${0}`
+    );
+    expect(result.taskId).toBe(assertion.taskId);
+    expect(result.result).toBe(AssertionValidationResult.Failed);
+  });
 });
 
 describe("AssertionValidationOrchestrator validation tests", () => {
@@ -263,8 +327,8 @@ describe("AssertionValidationOrchestrator exception tests", () => {
 
   it("TaskServiceFailure should throw AssertionValidation error", async () => {
     taskRunService.getBuildTaskRun = jest.fn().mockImplementation(() => {
-        throw Error("some error message");
-      });
+      throw Error("some error message");
+    });
     let error: AssertionValidationOrchestratorError;
     try {
       await taskValidationOrchestrator.checkAssertions(createAssertion());
@@ -273,9 +337,7 @@ describe("AssertionValidationOrchestrator exception tests", () => {
     }
     expect(error).toBeInstanceOf(AssertionValidationOrchestratorError);
     expect(error.message).toBe(`An internal error has occured.`);
-    expect(error.innerException.message).toBe(
-      "some error message"
-    );
+    expect(error.innerException.message).toBe("some error message");
   });
 });
 

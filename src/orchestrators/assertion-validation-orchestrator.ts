@@ -53,19 +53,24 @@ export class AssertionValidationOrchestrator
       result: AssertionValidationResult.Succeeded,
       messages: [],
     };
-
     if (taskRun.errorCount !== assertion.expectedErrorCount) {
-      taskValidationReport.messages.push("");
+      taskValidationReport.messages.push(
+        `Expected error count: ${assertion.expectedErrorCount} Recieved: ${taskRun.errorCount}`
+      );
       taskValidationReport.result = AssertionValidationResult.Failed;
     }
 
     if (taskRun.warningCount !== assertion.expectedWarningCount) {
-      taskValidationReport.messages.push("");
+      taskValidationReport.messages.push(
+        `Expected warning count: ${assertion.expectedWarningCount} Recieved: ${taskRun.warningCount}`
+      );
       taskValidationReport.result = AssertionValidationResult.Failed;
     }
 
     if (taskRun.taskResult !== assertion.expectedTaskResult) {
-      taskValidationReport.messages.push("");
+      taskValidationReport.messages.push(
+        `Expected task result: ${assertion.expectedTaskResult} Recieved: ${taskRun.taskResult}`
+      );
       taskValidationReport.result = AssertionValidationResult.Failed;
     }
 
