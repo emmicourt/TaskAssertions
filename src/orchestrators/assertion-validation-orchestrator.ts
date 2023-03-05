@@ -43,6 +43,11 @@ export class AssertionValidationOrchestrator
           assertion.expectedErrorCount,
           this.IsNonNaturalNumber,
         ],
+        [
+          "expectedWarningCount",
+          assertion.expectedErrorCount,
+          this.IsNonNaturalNumber,
+        ],
       ]);
 
       const taskRun = await this.taskRunService.getBuildTaskRun(
