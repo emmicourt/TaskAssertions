@@ -92,7 +92,7 @@ describe("TaskRunService input validation tests", () => {
   });
 
   test.each([undefined, null, "", " "])(
-    "given %p as argument taskId, throw validation error ",
+    "Input: taskId Value: %p as argument. Throw validation error ",
     async (taskId) => {
       let error: Error;
       try {
@@ -114,7 +114,7 @@ describe("TaskRunService input validation tests", () => {
   );
 
   test.each([undefined, null, "", " "])(
-    "given %p as argument jobId, throw validation error ",
+    "Input: jobId Value: %p. throw validation error ",
     async (jobId) => {
       let error: Error;
       try {
@@ -136,7 +136,7 @@ describe("TaskRunService input validation tests", () => {
   );
 
   test.each([undefined, null, "", " "])(
-    "given %p as argument projectName, throw validation error ",
+    "Input: ProjectName Value: %p, throw validation error ",
     async (projectName) => {
       let error: Error;
       try {
@@ -158,7 +158,7 @@ describe("TaskRunService input validation tests", () => {
   );
 
   test.each([undefined, null, "", " "])(
-    "given %p as argument buildId, throw validation error ",
+    "Input: BuildId Value: %p, throw validation error ",
     async (buildId) => {
       let error: Error;
       try {
