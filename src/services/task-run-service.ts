@@ -3,12 +3,12 @@ import {
   TimelineRecord,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IBuildTimelineClient } from "../clients/build-timeline-client";
-import { TaskRunServiceError } from "../contracts/task-run-service-error";
-import { TaskRun } from "../contracts/task-run";
 import { IsNullOrWhitespace } from "../common/string-utils";
-import { TaskRunServiceInputValidationError } from "../contracts/task-run-service-input-validation-error";
+import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-service-error";
+import { TaskRunServiceInputValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
+import { TaskRun } from "../contracts/task-runs/task-run";
 
-export interface IBuildTaskRunService {
+export interface ITaskRunService {
   getBuildTaskRun(
     projectName: string,
     buildId: string,
@@ -17,7 +17,7 @@ export interface IBuildTaskRunService {
   ): Promise<TaskRun | undefined>;
 }
 
-export class BuildTaskRunService implements IBuildTaskRunService {
+export class BuildTaskRunService implements ITaskRunService {
   private buildTimelineClient: IBuildTimelineClient;
 
   constructor(buildTimelineClient: IBuildTimelineClient) {
