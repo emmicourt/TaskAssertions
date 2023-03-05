@@ -35,20 +35,7 @@ export class AssertionValidationOrchestrator
       const projectName = taskConfig.getProjectName();
       const jobId = taskConfig.getJobId();
       const buildId = taskConfig.getBuildId();
-
-      this.validate([
-        ["taskId", assertion.taskId, IsNullOrWhitespace],
-        [
-          "expectedErrorCount",
-          assertion.expectedErrorCount,
-          this.IsNonNaturalNumber,
-        ],
-        [
-          "expectedWarningCount",
-          assertion.expectedWarningCount,
-          this.IsNonNaturalNumber,
-        ],
-      ]);
+      this.validateAssertion(assertion);
 
       const taskRun = await this.taskRunService.getBuildTaskRun(
         projectName,
@@ -92,6 +79,31 @@ export class AssertionValidationOrchestrator
     return taskValidationReport;
   }
 
+  private validateAssertion(assertion: Assertion): void {
+    if (this.IsNullOrUndefined(assertion)) {
+      throw new NullAssertionError();
+    }
+    this.validate([
+      ["taskId", assertion.taskId, IsNullOrWhitespace],
+      [
+        "expectedErrorCount",
+        assertion.expectedErrorCount,
+        this.IsNonNaturalNumber,
+      ],
+      [
+        "expectedWarningCount",
+        assertion.expectedWarningCount,
+        this.IsNonNaturalNumber,
+      ],
+      [
+        "expectedTaskResult",
+        assertion.expectedTaskResult,
+        this.IsNullOrUndefined,
+      ],
+      ["expectedMessages", assertion.expectedMessages, this.IsNullOrUndefined],
+    ]);
+  }
+
   private validate(
     inputs: [
       parameterName: string,
@@ -113,10 +125,13 @@ export class AssertionValidationOrchestrator
     return false;
   }
 
+  private IsNullOrUndefined(obj: unknown) {
+    return obj === undefined || obj === null;
+  }
+
   private mapException(err: Error) {
     switch (err.name) {
       case InvalidAssertionError.name:
-        throw new AssertionValidationError(err);
       case NullAssertionError.name:
         throw new AssertionValidationError(err);
       default:

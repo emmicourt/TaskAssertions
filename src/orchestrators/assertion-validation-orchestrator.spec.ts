@@ -6,6 +6,7 @@ import { AssertionValidationError } from "../contracts/assertions/exceptions/ass
 import { InvalidAssertionError } from "../contracts/assertions/exceptions/invalid-assertion-error";
 import { AssertionValidationOrchestrator } from "./assertion-validation-orchestrator";
 import { AssertionValidationResult } from "../contracts/assertion-validation-results/assertion-validation-result";
+import { NullAssertionError } from "../contracts/assertions/exceptions/null-assertion-error";
 
 describe("AssertionValidationOrchestrator logical tests", () => {
   const getBuildTaskRun = jest.fn(
@@ -117,6 +118,67 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       expect(error.message).toBe(`Invalid Assertion.`);
       expect(error.innerException.message).toBe(
         `Invalid Assertion. Parameter name expectedWarningCount Parameter value: ${expectedWarningCount}`
+      );
+    }
+  );
+
+  test.each([undefined, null])(
+    "Input: assertion.expectedTaskResult Value: %p throw error",
+    async (expectedTaskResult) => {
+      const assertion: Assertion = createAssertion();
+      assertion.expectedTaskResult = expectedTaskResult;
+      let error: AssertionValidationError;
+
+      try {
+        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeInstanceOf(AssertionValidationError);
+      expect(error.innerException).toBeInstanceOf(InvalidAssertionError);
+      expect(error.message).toBe(`Invalid Assertion.`);
+      expect(error.innerException.message).toBe(
+        `Invalid Assertion. Parameter name expectedTaskResult Parameter value: ${expectedTaskResult}`
+      );
+    }
+  );
+
+  test.each([undefined, null])(
+    "Input: assertion.expectedMessages Value: %p throw error",
+    async (expectedMessages) => {
+      const assertion: Assertion = createAssertion();
+      assertion.expectedMessages = expectedMessages;
+      let error: AssertionValidationError;
+
+      try {
+        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeInstanceOf(AssertionValidationError);
+      expect(error.innerException).toBeInstanceOf(InvalidAssertionError);
+      expect(error.message).toBe(`Invalid Assertion.`);
+      expect(error.innerException.message).toBe(
+        `Invalid Assertion. Parameter name expectedMessages Parameter value: ${expectedMessages}`
+      );
+    }
+  );
+
+  test.each([undefined, null])(
+    "Input: assertion Value: %p throw error",
+    async (assertion) => {
+      let error: AssertionValidationError;
+
+      try {
+        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeInstanceOf(AssertionValidationError);
+      expect(error.innerException).toBeInstanceOf(NullAssertionError);
+      expect(error.message).toBe(`Invalid Assertion.`);
+      expect(error.innerException.message).toBe(
+        "Invalid Assertion. Assertion cannot be null or undefined."
       );
     }
   );
