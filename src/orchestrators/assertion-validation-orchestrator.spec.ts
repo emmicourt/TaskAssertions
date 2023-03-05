@@ -78,6 +78,27 @@ describe("AssertionValidationOrchestrator validation tests", () => {
       );
     }
   );
+
+  test.each([-1, 0.5])(
+    "Input: assertion.expectedErrorCount Value: %p throw error",
+    async (expectedErrorCount) => {
+      const assertion: Assertion = createAssertion();
+      assertion.expectedErrorCount = expectedErrorCount;
+      let error: AssertionValidationError;
+
+      try {
+        await taskValidationOrchestrator.checkAssertions(taskConfig, assertion);
+      } catch (err) {
+        error = err;
+      }
+      expect(error).toBeInstanceOf(AssertionValidationError);
+      expect(error.innerException).toBeInstanceOf(InvalidAssertionError);
+      expect(error.message).toBe(`Invalid Assertion.`);
+      expect(error.innerException.message).toBe(
+        `Invalid Assertion. Parameter name expectedErrorCount Parameter value: ${expectedErrorCount}`
+      );
+    }
+  );
 });
 
 function createAssertion(): Assertion {

@@ -31,12 +31,19 @@ export class AssertionValidationOrchestrator
     taskConfig: TaskConfig,
     assertion: Assertion
   ): Promise<AssertionValidationReport> {
-    try{
+    try {
       const projectName = taskConfig.getProjectName();
       const jobId = taskConfig.getJobId();
       const buildId = taskConfig.getBuildId();
 
-      this.validate([["taskId", assertion.taskId, IsNullOrWhitespace]]);
+      this.validate([
+        ["taskId", assertion.taskId, IsNullOrWhitespace],
+        [
+          "expectedErrorCount",
+          assertion.expectedErrorCount,
+          this.IsNonNaturalNumber,
+        ],
+      ]);
 
       const taskRun = await this.taskRunService.getBuildTaskRun(
         projectName,
@@ -46,7 +53,7 @@ export class AssertionValidationOrchestrator
       );
 
       return this.createTaskValidationResult(assertion, taskRun);
-    } catch (err){
+    } catch (err) {
       this.mapException(err);
     }
   }
@@ -94,7 +101,14 @@ export class AssertionValidationOrchestrator
     });
   }
 
-  private mapException(err:Error){
+  private IsNonNaturalNumber(num: number) {
+    if (num < 0 || num % 1 !== 0) {
+      return true;
+    }
+    return false;
+  }
+
+  private mapException(err: Error) {
     switch (err.name) {
       case InvalidAssertionError.name:
         throw new AssertionValidationError(err);
