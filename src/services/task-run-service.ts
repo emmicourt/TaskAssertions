@@ -4,8 +4,9 @@ import {
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IBuildTimelineClient } from "../clients/build-timeline-client";
 import { IsNullOrWhitespace } from "../common/string-utils";
+import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run-not-found-error";
 import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-service-error";
-import { TaskRunServiceInputValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
+import { TaskRunServiceValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
 import { TaskRun } from "../contracts/task-runs/task-run";
 
 export interface ITaskRunService {
@@ -47,13 +48,11 @@ export class BuildTaskRunService implements ITaskRunService {
         taskId
       );
 
-      if (!taskRecord) {
-        return undefined;
-      }
+      this.validateTaskRun(taskRecord);
 
       return this.mapTimelineToTaskRun(taskRecord, buildId);
-    } catch (error) {
-      throw new TaskRunServiceError(error.message);
+    } catch (err) {
+      this.mapException(err);
     }
   }
 
@@ -84,6 +83,16 @@ export class BuildTaskRunService implements ITaskRunService {
     };
   }
 
+  private validateTaskRun(timelineRecord: TimelineRecord) : void{
+    if(this.IsNullOrUndefined(timelineRecord)){
+      throw new TaskRunNotFoundError();
+    }
+  }
+
+  private IsNullOrUndefined(obj: unknown) {
+    return obj === undefined || obj === null;
+  }
+
   private validateInputParameters(
     inputs: [
       parameterName: string,
@@ -93,8 +102,18 @@ export class BuildTaskRunService implements ITaskRunService {
   ): void {
     inputs.forEach(([name, value, rule]) => {
       if (rule(value)) {
-        throw new TaskRunServiceInputValidationError(name, value);
+        throw new TaskRunServiceValidationError(name, value);
       }
     });
+  }
+
+  private mapException(err:Error){
+    switch(err.name){
+      case TaskRunServiceValidationError.name:
+      case TaskRunNotFoundError.name:
+        throw err;
+      default:
+        throw new TaskRunServiceError(err);
+    }
   }
 }
