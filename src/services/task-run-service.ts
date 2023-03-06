@@ -18,7 +18,7 @@ export interface ITaskRunService {
   ): Promise<TaskRun | undefined>;
 }
 
-export class BuildTaskRunService implements ITaskRunService {
+export class TaskRunService implements ITaskRunService {
   private buildTimelineClient: IBuildTimelineClient;
 
   constructor(buildTimelineClient: IBuildTimelineClient) {

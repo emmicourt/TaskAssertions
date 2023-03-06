@@ -22,6 +22,6 @@ describe("index input validation", () => {
     run();
 
     expect(tlSpy).toHaveBeenCalledTimes(0);
-    expect(tlGetInput).toHaveBeenLastCalledWith("taskId", true);
+    expect(tlGetInput).toHaveBeenCalledWith("taskId", true);
   });
 });

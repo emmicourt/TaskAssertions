@@ -5,7 +5,7 @@ import {
 import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run-not-found-error";
 import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-service-error";
 import { TaskRunServiceValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
-import { BuildTaskRunService } from "./task-run-service";
+import { TaskRunService } from "./task-run-service";
 
 describe("TaskRunService logical tests", () => {
   const jobId = "someJobId";
@@ -22,7 +22,7 @@ describe("TaskRunService logical tests", () => {
     };
   });
   const buildTimelineClient = new buildTimelineClientMock();
-  const buildTaskRunService = new BuildTaskRunService(buildTimelineClient);
+  const buildTaskRunService = new TaskRunService(buildTimelineClient);
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -97,7 +97,7 @@ describe("TaskRunService input validation tests", () => {
     };
   });
   const buildTimelineClient = new buildTimelineClientMock();
-  const buildTaskRunService = new BuildTaskRunService(buildTimelineClient);
+  const buildTaskRunService = new TaskRunService(buildTimelineClient);
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -208,7 +208,7 @@ describe("TaskRunService exception tests", () => {
     };
   });
   const buildTimelineClient = new buildTimelineClientMock();
-  const buildTaskRunService = new BuildTaskRunService(buildTimelineClient);
+  const buildTaskRunService = new TaskRunService(buildTimelineClient);
 
   afterEach(() => {
     jest.clearAllMocks();
