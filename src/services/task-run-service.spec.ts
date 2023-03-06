@@ -46,7 +46,7 @@ describe("TaskRunService logical tests", () => {
 
   it("should return undefined if task not found ", async () => {
     const otherTaskId = "someOtherTaskId";
-    let result: TaskRunServiceError;
+    let resultError: TaskRunNotFoundError;
     try {
       await buildTaskRunService.getBuildTaskRun(
         project,
@@ -55,8 +55,11 @@ describe("TaskRunService logical tests", () => {
         otherTaskId
       );
     } catch (err) {
-      result = err;
+      resultError = err;
     }
+    expect(resultError).toBeInstanceOf(TaskRunNotFoundError);
+    expect(resultError.message).toBe(`Error task run not found in build job.`);
+    expect(resultError.name).toBe(TaskRunNotFoundError.name);
   });
 
   it("should return undefined if job not found ", async () => {
