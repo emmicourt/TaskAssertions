@@ -47,29 +47,29 @@ describe("TaskRunService logical tests", () => {
   it("should return undefined if task not found ", async () => {
     const otherTaskId = "someOtherTaskId";
     let result: TaskRunServiceError;
-    try{
+    try {
       await buildTaskRunService.getBuildTaskRun(
         project,
         buildId,
         jobId,
         otherTaskId
       );
-    }catch(err){
+    } catch (err) {
       result = err;
     }
   });
 
   it("should return undefined if job not found ", async () => {
     const otherJobId = "someOtherJobId";
-    let resultError : TaskRunNotFoundError;
-    try{
+    let resultError: TaskRunNotFoundError;
+    try {
       await buildTaskRunService.getBuildTaskRun(
         project,
         buildId,
         otherJobId,
         taskId
       );
-    }catch(err){
+    } catch (err) {
       resultError = err;
     }
 
@@ -231,7 +231,7 @@ describe("TaskRunService exception tests", () => {
     expect(error).toBeInstanceOf(TaskRunServiceError);
     expect(error.message).toBe(`Error.`);
     expect(error.name).toBe(TaskRunServiceError.name);
-    expect(error.innerException).not.toBeUndefined()
+    expect(error.innerException).not.toBeUndefined();
     expect(error.innerException).not.toBeNull();
     expect(error.innerException.message).toBe("some api error");
   });

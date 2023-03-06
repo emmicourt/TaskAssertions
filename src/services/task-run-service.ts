@@ -83,8 +83,8 @@ export class BuildTaskRunService implements ITaskRunService {
     };
   }
 
-  private validateTaskRun(timelineRecord: TimelineRecord) : void{
-    if(this.IsNullOrUndefined(timelineRecord)){
+  private validateTaskRun(timelineRecord: TimelineRecord): void {
+    if (this.IsNullOrUndefined(timelineRecord)) {
       throw new TaskRunNotFoundError();
     }
   }
@@ -107,8 +107,8 @@ export class BuildTaskRunService implements ITaskRunService {
     });
   }
 
-  private mapException(err:Error){
-    switch(err.name){
+  private mapException(err: Error) {
+    switch (err.name) {
       case TaskRunServiceValidationError.name:
       case TaskRunNotFoundError.name:
         throw err;

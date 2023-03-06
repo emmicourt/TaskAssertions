@@ -89,14 +89,10 @@ describe("AssertionValidationOrchestrator logical tests", () => {
       `Expected task result: ${assertion.expectedTaskResult} Recieved: ${tl.TaskResult.Succeeded}`
     );
     expect(result.messages).toContain(
-      `Expected error count: ${
-        assertion.expectedErrorCount
-      } Recieved: ${0}`
+      `Expected error count: ${assertion.expectedErrorCount} Recieved: ${0}`
     );
     expect(result.messages).toContain(
-      `Expected warning count: ${
-        assertion.expectedWarningCount
-      } Recieved: ${0}`
+      `Expected warning count: ${assertion.expectedWarningCount} Recieved: ${0}`
     );
     expect(result.taskId).toBe(assertion.taskId);
     expect(result.result).toBe(AssertionValidationResult.Failed);
