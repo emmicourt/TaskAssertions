@@ -1,6 +1,8 @@
 export class TaskRunServiceError extends Error {
-  constructor(message: string) {
-    super(`Error getting build timeline. ${message}`);
+  innerException: Error;
+  constructor(innerException: Error) {
+    super("Error.");
     this.name = "TaskRunServiceError";
+    this.innerException = innerException;
   }
 }

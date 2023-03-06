@@ -2,8 +2,9 @@ import {
   TaskResult,
   Timeline,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
+import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run-not-found-error";
 import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-service-error";
-import { TaskRunServiceInputValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
+import { TaskRunServiceValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
 import { BuildTaskRunService } from "./task-run-service";
 
 describe("TaskRunService logical tests", () => {
@@ -45,28 +46,36 @@ describe("TaskRunService logical tests", () => {
 
   it("should return undefined if task not found ", async () => {
     const otherTaskId = "someOtherTaskId";
-
-    const result = await buildTaskRunService.getBuildTaskRun(
-      project,
-      buildId,
-      jobId,
-      otherTaskId
-    );
-
-    expect(result).toBeUndefined();
+    let result: TaskRunServiceError;
+    try {
+      await buildTaskRunService.getBuildTaskRun(
+        project,
+        buildId,
+        jobId,
+        otherTaskId
+      );
+    } catch (err) {
+      result = err;
+    }
   });
 
   it("should return undefined if job not found ", async () => {
     const otherJobId = "someOtherJobId";
+    let resultError: TaskRunNotFoundError;
+    try {
+      await buildTaskRunService.getBuildTaskRun(
+        project,
+        buildId,
+        otherJobId,
+        taskId
+      );
+    } catch (err) {
+      resultError = err;
+    }
 
-    const result = await buildTaskRunService.getBuildTaskRun(
-      project,
-      buildId,
-      otherJobId,
-      taskId
-    );
-
-    expect(result).toBeUndefined();
+    expect(resultError).toBeInstanceOf(TaskRunNotFoundError);
+    expect(resultError.message).toBe(`Error task run not found in build job.`);
+    expect(resultError.name).toBe(TaskRunNotFoundError.name);
   });
 });
 
@@ -105,11 +114,11 @@ describe("TaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter taskId cannot be ${taskId}`
       );
-      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceValidationError.name);
     }
   );
 
@@ -127,11 +136,11 @@ describe("TaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter jobId cannot be ${jobId}`
       );
-      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceValidationError.name);
     }
   );
 
@@ -149,11 +158,11 @@ describe("TaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter projectName cannot be ${projectName}`
       );
-      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceValidationError.name);
     }
   );
 
@@ -171,11 +180,11 @@ describe("TaskRunService input validation tests", () => {
       } catch (resultError) {
         error = resultError;
       }
-      expect(error).toBeInstanceOf(TaskRunServiceInputValidationError);
+      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
       expect(error.message).toBe(
         `Invalid input: parameter buildId cannot be ${buildId}`
       );
-      expect(error.name).toBe(TaskRunServiceInputValidationError.name);
+      expect(error.name).toBe(TaskRunServiceValidationError.name);
     }
   );
 });
@@ -203,7 +212,7 @@ describe("TaskRunService exception tests", () => {
   });
 
   it("should throw error if client returns error", async () => {
-    let error: Error;
+    let error: TaskRunServiceError;
     buildTimelineClient.getBuildTimeline = jest.fn().mockImplementation(() => {
       throw Error(message);
     });
@@ -220,8 +229,11 @@ describe("TaskRunService exception tests", () => {
     }
 
     expect(error).toBeInstanceOf(TaskRunServiceError);
-    expect(error.message).toBe(`Error getting build timeline. ${message}`);
+    expect(error.message).toBe(`Error.`);
     expect(error.name).toBe(TaskRunServiceError.name);
+    expect(error.innerException).not.toBeUndefined();
+    expect(error.innerException).not.toBeNull();
+    expect(error.innerException.message).toBe("some api error");
   });
 });
 
