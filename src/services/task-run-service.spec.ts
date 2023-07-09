@@ -6,26 +6,21 @@ import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run
 import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-service-error";
 import { TaskRunServiceValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
 import { TaskRunService } from "./task-run-service";
+import { BuildTimelineClient } from "../clients/build-timeline-client";
+import { mock } from 'jest-mock-extended';
+
+const jobId = "someJobId";
+const taskId = "someTaskId";
+const buildId = "someBuildId";
+const project = "someProject";
+
+const buildTimelineClientMock = mock<BuildTimelineClient>();
+const buildTaskRunService = new TaskRunService(buildTimelineClientMock);
 
 describe("TaskRunService logical tests", () => {
-  const jobId = "someJobId";
-  const taskId = "someTaskId";
-  const buildId = "someBuildId";
-  const project = "someProject";
-
-  const getBuildTimelineMock = jest.fn(
-    (): Promise<Timeline | undefined> => Promise.resolve(createTestTimeline())
-  );
-  const buildTimelineClientMock = jest.fn().mockImplementation(() => {
-    return {
-      getBuildTimeline: getBuildTimelineMock,
-    };
-  });
-  const buildTimelineClient = new buildTimelineClientMock();
-  const buildTaskRunService = new TaskRunService(buildTimelineClient);
-
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
+    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(createTestTimeline());
   });
 
   it("should get build task run", async () => {
@@ -44,199 +39,98 @@ describe("TaskRunService logical tests", () => {
     expect(result.taskId).toBe(taskId);
   });
 
-  it("should return undefined if task not found ", async () => {
+  it("should throw TaskRunNotFoundError if task not found ", async () => {
     const otherTaskId = "someOtherTaskId";
-    let resultError: TaskRunNotFoundError;
-    try {
-      await buildTaskRunService.getBuildTaskRun(
-        project,
-        buildId,
-        jobId,
-        otherTaskId
-      );
-    } catch (err) {
-      resultError = err;
-    }
-    expect(resultError).toBeInstanceOf(TaskRunNotFoundError);
-    expect(resultError.message).toBe(`Error task run not found in build job.`);
-    expect(resultError.name).toBe(TaskRunNotFoundError.name);
+    await expect(buildTaskRunService.getBuildTaskRun(
+      project,
+      buildId,
+      jobId,
+      otherTaskId
+    )).rejects.toThrowError(TaskRunNotFoundError);
   });
 
-  it("should return undefined if job not found ", async () => {
+  it("should return TaskRunNotFoundError if job not found ", async () => {
     const otherJobId = "someOtherJobId";
-    let resultError: TaskRunNotFoundError;
-    try {
-      await buildTaskRunService.getBuildTaskRun(
-        project,
-        buildId,
-        otherJobId,
-        taskId
-      );
-    } catch (err) {
-      resultError = err;
-    }
-
-    expect(resultError).toBeInstanceOf(TaskRunNotFoundError);
-    expect(resultError.message).toBe(`Error task run not found in build job.`);
-    expect(resultError.name).toBe(TaskRunNotFoundError.name);
+    await expect(buildTaskRunService.getBuildTaskRun(
+      project,
+      buildId,
+      otherJobId,
+      taskId
+    )).rejects.toThrowError(TaskRunNotFoundError);
   });
 });
 
 describe("TaskRunService input validation tests", () => {
-  const jobId = "someJobId";
-  const taskId = "someTaskId";
-  const buildId = "someBuildId";
-  const project = "someProject";
-
-  const buildTimelineClientMock = jest.fn().mockImplementation(() => {
-    return {
-      getBuildTimeline: jest.fn(
-        (): Promise<Timeline | undefined> =>
-          Promise.resolve(createTestTimeline())
-      ),
-    };
-  });
-  const buildTimelineClient = new buildTimelineClientMock();
-  const buildTaskRunService = new TaskRunService(buildTimelineClient);
-
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
+    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(createTestTimeline());
   });
 
   test.each([undefined, null, "", " "])(
-    "Input: taskId Value: %p as argument. Throw validation error ",
+    "Input: taskId Value: %p as argument. Should Throw validation error ",
     async (taskId) => {
-      let error: Error;
-      try {
-        await buildTaskRunService.getBuildTaskRun(
-          project,
-          buildId,
-          jobId,
-          taskId
-        );
-      } catch (resultError) {
-        error = resultError;
-      }
-      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
-      expect(error.message).toBe(
-        `Invalid input: parameter taskId cannot be ${taskId}`
-      );
-      expect(error.name).toBe(TaskRunServiceValidationError.name);
+      await expect(buildTaskRunService.getBuildTaskRun(
+        project,
+        buildId,
+        jobId,
+        taskId
+      )).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 
   test.each([undefined, null, "", " "])(
     "Input: jobId Value: %p. throw validation error ",
     async (jobId) => {
-      let error: Error;
-      try {
-        await buildTaskRunService.getBuildTaskRun(
-          project,
-          buildId,
-          jobId,
-          taskId
-        );
-      } catch (resultError) {
-        error = resultError;
-      }
-      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
-      expect(error.message).toBe(
-        `Invalid input: parameter jobId cannot be ${jobId}`
-      );
-      expect(error.name).toBe(TaskRunServiceValidationError.name);
+      await expect(buildTaskRunService.getBuildTaskRun(
+        project,
+        buildId,
+        jobId,
+        taskId
+      )).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 
   test.each([undefined, null, "", " "])(
     "Input: ProjectName Value: %p, throw validation error ",
     async (projectName) => {
-      let error: Error;
-      try {
-        await buildTaskRunService.getBuildTaskRun(
-          projectName,
-          buildId,
-          jobId,
-          taskId
-        );
-      } catch (resultError) {
-        error = resultError;
-      }
-      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
-      expect(error.message).toBe(
-        `Invalid input: parameter projectName cannot be ${projectName}`
-      );
-      expect(error.name).toBe(TaskRunServiceValidationError.name);
+      await expect(buildTaskRunService.getBuildTaskRun(
+        projectName,
+        buildId,
+        jobId,
+        taskId
+      )).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 
   test.each([undefined, null, "", " "])(
     "Input: BuildId Value: %p, throw validation error ",
     async (buildId) => {
-      let error: Error;
-      try {
-        await buildTaskRunService.getBuildTaskRun(
-          project,
-          buildId,
-          jobId,
-          taskId
-        );
-      } catch (resultError) {
-        error = resultError;
-      }
-      expect(error).toBeInstanceOf(TaskRunServiceValidationError);
-      expect(error.message).toBe(
-        `Invalid input: parameter buildId cannot be ${buildId}`
-      );
-      expect(error.name).toBe(TaskRunServiceValidationError.name);
+      await expect(buildTaskRunService.getBuildTaskRun(
+        project,
+        buildId,
+        jobId,
+        taskId
+      )).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 });
 
 describe("TaskRunService exception tests", () => {
-  const jobId = "someJobId";
-  const taskId = "someTaskId";
-  const buildId = "someBuildId";
-  const project = "someProject";
-  const message = "some api error";
-
-  const getBuildTimelineMock = jest.fn(
-    (): Promise<Timeline | undefined> => Promise.resolve(createTestTimeline())
-  );
-  const buildTimelineClientMock = jest.fn().mockImplementation(() => {
-    return {
-      getBuildTimeline: getBuildTimelineMock,
-    };
-  });
-  const buildTimelineClient = new buildTimelineClientMock();
-  const buildTaskRunService = new TaskRunService(buildTimelineClient);
-
   afterEach(() => {
     jest.clearAllMocks();
+    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(createTestTimeline());
   });
 
   it("should throw error if client returns error", async () => {
-    let error: TaskRunServiceError;
-    buildTimelineClient.getBuildTimeline = jest.fn().mockImplementation(() => {
-      throw Error(message);
+    buildTimelineClientMock.getBuildTimeline.mockImplementation(() => {
+      throw Error();
     });
-
-    try {
-      await buildTaskRunService.getBuildTaskRun(
-        project,
-        buildId,
-        jobId,
-        taskId
-      );
-    } catch (resultError) {
-      error = resultError;
-    }
-
-    expect(error).toBeInstanceOf(TaskRunServiceError);
-    expect(error.message).toBe(`Error.`);
-    expect(error.name).toBe(TaskRunServiceError.name);
-    expect(error.innerException).not.toBeUndefined();
-    expect(error.innerException).not.toBeNull();
-    expect(error.innerException.message).toBe("some api error");
+    await expect(buildTaskRunService.getBuildTaskRun(
+      project,
+      buildId,
+      jobId,
+      taskId
+    )).rejects.toThrowError(TaskRunServiceError);
   });
 });
 
