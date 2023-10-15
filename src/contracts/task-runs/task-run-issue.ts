@@ -1,4 +1,4 @@
-export class TaskRunIssue {
+export interface TaskRunIssue {
   message: string;
   level: string;
 }

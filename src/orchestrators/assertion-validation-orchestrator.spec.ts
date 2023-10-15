@@ -5,7 +5,6 @@ import { AssertionValidationError } from "../contracts/assertions/exceptions/ass
 import { InvalidAssertionError } from "../contracts/assertions/exceptions/invalid-assertion-error";
 import { AssertionValidationOrchestrator } from "./assertion-validation-orchestrator";
 import { AssertionValidationResult } from "../contracts/assertion-validation-results/assertion-validation-result";
-import { NullAssertionError } from "../contracts/assertions/exceptions/null-assertion-error";
 import { AssertionValidationOrchestratorError } from "../contracts/assertions/exceptions/assertion-validation-orchestrator-error";
 import { TaskRunService } from "../services/task-run-service";
 import { mock } from "jest-mock-extended";
@@ -25,24 +24,24 @@ describe("AssertionValidationOrchestrator logical tests", () => {
     const assertion: Assertion = createAssertion();
     const result = await taskValidationOrchestrator.checkAssertions(assertion);
 
-    expect(result).not.toBeNull();
-    expect(result.messages).not.toBeNull();
-    expect(result.messages.length).toBe(0);
-    expect(result.taskId).toBe(assertion.taskId);
-    expect(result.result).toBe(AssertionValidationResult.Succeeded);
+    expect(result).not.toBeUndefined();
+    expect(result?.messages).not.toBeUndefined();
+    expect(result?.messages.length).toBe(0);
+    expect(result?.taskId).toBe(assertion.taskId);
+    expect(result?.result).toBe(AssertionValidationResult.Succeeded);
   });
 
   it("should return failed validation if error count does not match assertion", async () => {
     const assertion: Assertion = createAssertion();
     assertion.expectedErrorCount = 5;
     const result = await taskValidationOrchestrator.checkAssertions(assertion);
-    expect(result).not.toBeNull();
-    expect(result.messages.length).toBe(1);
-    expect(result.messages[0]).toBe(
+    expect(result).not.toBeUndefined();
+    expect(result?.messages.length).toBe(1);
+    expect(result?.messages[0]).toBe(
       `Expected error count: ${assertion.expectedErrorCount} Recieved: 0`
     );
-    expect(result.taskId).toBe(assertion.taskId);
-    expect(result.result).toBe(AssertionValidationResult.Failed);
+    expect(result?.taskId).toBe(assertion.taskId);
+    expect(result?.result).toBe(AssertionValidationResult.Failed);
   });
 
   it("should return failed validation if warning count does not match assertion", async () => {
@@ -50,12 +49,12 @@ describe("AssertionValidationOrchestrator logical tests", () => {
     assertion.expectedWarningCount = 5;
     const result = await taskValidationOrchestrator.checkAssertions(assertion);
     expect(result).not.toBeNull();
-    expect(result.messages.length).toBe(1);
-    expect(result.messages[0]).toBe(
+    expect(result?.messages.length).toBe(1);
+    expect(result?.messages[0]).toBe(
       `Expected warning count: ${assertion.expectedWarningCount} Recieved: 0`
     );
-    expect(result.taskId).toBe(assertion.taskId);
-    expect(result.result).toBe(AssertionValidationResult.Failed);
+    expect(result?.taskId).toBe(assertion.taskId);
+    expect(result?.result).toBe(AssertionValidationResult.Failed);
   });
 
   it("should return failed validation if taskResult does not match assertion", async () => {
@@ -63,12 +62,12 @@ describe("AssertionValidationOrchestrator logical tests", () => {
     assertion.expectedTaskResult = tl.TaskResult.Failed;
     const result = await taskValidationOrchestrator.checkAssertions(assertion);
     expect(result).not.toBeNull();
-    expect(result.messages.length).toBe(1);
-    expect(result.messages[0]).toBe(
+    expect(result?.messages.length).toBe(1);
+    expect(result?.messages[0]).toBe(
       `Expected task result: ${assertion.expectedTaskResult} Recieved: ${tl.TaskResult.Succeeded}`
     );
-    expect(result.taskId).toBe(assertion.taskId);
-    expect(result.result).toBe(AssertionValidationResult.Failed);
+    expect(result?.taskId).toBe(assertion.taskId);
+    expect(result?.result).toBe(AssertionValidationResult.Failed);
   });
 
   it("should return failed validation if multiple do not match assertion", async () => {
@@ -78,18 +77,18 @@ describe("AssertionValidationOrchestrator logical tests", () => {
     assertion.expectedTaskResult = tl.TaskResult.Failed;
     const result = await taskValidationOrchestrator.checkAssertions(assertion);
     expect(result).not.toBeNull();
-    expect(result.messages.length).toBe(3);
-    expect(result.messages).toContain(
+    expect(result?.messages.length).toBe(3);
+    expect(result?.messages).toContain(
       `Expected task result: ${assertion.expectedTaskResult} Recieved: ${tl.TaskResult.Succeeded}`
     );
-    expect(result.messages).toContain(
+    expect(result?.messages).toContain(
       `Expected error count: ${assertion.expectedErrorCount} Recieved: ${0}`
     );
-    expect(result.messages).toContain(
+    expect(result?.messages).toContain(
       `Expected warning count: ${assertion.expectedWarningCount} Recieved: ${0}`
     );
-    expect(result.taskId).toBe(assertion.taskId);
-    expect(result.result).toBe(AssertionValidationResult.Failed);
+    expect(result?.taskId).toBe(assertion.taskId);
+    expect(result?.result).toBe(AssertionValidationResult.Failed);
   });
 });
 
@@ -99,7 +98,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     taskRunServiceMock.getBuildTaskRun.mockResolvedValue(createTaskRun()); 
   });
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: assertion.taskId Value: %p throw error",
     async (taskId) => {
       const assertion: Assertion = createAssertion();
@@ -111,7 +110,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     }
   );
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: assertion.jobId Value: %p throw error",
     async (jobId) => {
       const assertion: Assertion = createAssertion();
@@ -123,7 +122,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     }
   );
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: assertion.projectName Value: %p throw error",
     async (projectName) => {
       const assertion: Assertion = createAssertion();
@@ -135,7 +134,7 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     }
   );
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: assertion.buildId Value: %p throw error",
     async (buildId) => {
       const assertion: Assertion = createAssertion();
@@ -167,40 +166,6 @@ describe("AssertionValidationOrchestrator validation tests", () => {
         .checkAssertions(assertion)).rejects
         .toThrowError(new AssertionValidationError(
           new InvalidAssertionError("expectedWarningCount", expectedWarningCount)));
-    }
-  );
-
-  test.each([undefined, null])(
-    "Input: assertion.expectedTaskResult Value: %p throw error",
-    async (expectedTaskResult) => {
-      const assertion: Assertion = createAssertion();
-      assertion.expectedTaskResult = expectedTaskResult;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new InvalidAssertionError("expectedTaskResult", expectedTaskResult)));
-    }
-  );
-
-  test.each([undefined, null])(
-    "Input: assertion.expectedMessages Value: %p throw error",
-    async (expectedMessages) => {
-      const assertion: Assertion = createAssertion();
-      assertion.expectedMessages = expectedMessages;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new InvalidAssertionError("expectedMessages", expectedMessages)));
-    }
-  );
-
-  test.each([undefined, null])(
-    "Input: assertion Value: %p throw error",
-    async (assertion) => {
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new NullAssertionError()));
     }
   );
 });

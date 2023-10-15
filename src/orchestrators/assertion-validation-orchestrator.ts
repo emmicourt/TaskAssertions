@@ -8,11 +8,12 @@ import { AssertionValidationError } from "../contracts/assertions/exceptions/ass
 import { AssertionValidationOrchestratorError } from "../contracts/assertions/exceptions/assertion-validation-orchestrator-error";
 import { InvalidAssertionError } from "../contracts/assertions/exceptions/invalid-assertion-error";
 import { NullAssertionError } from "../contracts/assertions/exceptions/null-assertion-error";
+import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run-not-found-error";
 import { TaskRun } from "../contracts/task-runs/task-run";
 import { ITaskRunService } from "../services/task-run-service";
 
 export interface IAssertionValidationOrchestrator {
-  checkAssertions(assertion: Assertion): Promise<AssertionValidationReport>;
+  checkAssertions(assertion: Assertion): Promise<AssertionValidationReport | undefined>;
 }
 
 export class AssertionValidationOrchestrator
@@ -26,7 +27,7 @@ export class AssertionValidationOrchestrator
 
   public async checkAssertions(
     assertion: Assertion
-  ): Promise<AssertionValidationReport> {
+  ): Promise<AssertionValidationReport | undefined> {
     try {
       this.validateAssertion(assertion);
 
@@ -36,6 +37,10 @@ export class AssertionValidationOrchestrator
         assertion.jobId,
         assertion.taskId
       );
+
+      if(!taskRun){
+        throw new TaskRunNotFoundError();
+      }
 
       return this.createTaskValidationResult(assertion, taskRun);
     } catch (err) {
@@ -78,7 +83,7 @@ export class AssertionValidationOrchestrator
   }
 
   private validateAssertion(assertion: Assertion): void {
-    if (this.IsNullOrUndefined(assertion)) {
+    if (!assertion) {
       throw new NullAssertionError();
     }
     this.validate([
@@ -99,17 +104,20 @@ export class AssertionValidationOrchestrator
       [
         "expectedTaskResult",
         assertion.expectedTaskResult,
-        this.IsNullOrUndefined,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (object: any) => !object,
       ],
-      ["expectedMessages", assertion.expectedMessages, this.IsNullOrUndefined],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ["expectedMessages", assertion.expectedMessages, (object: any) => !object],
     ]);
   }
 
   private validate(
     inputs: [
       parameterName: string,
-      parameterValue: unknown,
-      rule: (value: unknown) => boolean
+      parameterValue: string | number | string[],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      rule: (value: any) => boolean
     ][]
   ): void {
     inputs.forEach(([name, value, rule]) => {
@@ -119,15 +127,11 @@ export class AssertionValidationOrchestrator
     });
   }
 
-  private IsNonNaturalNumber(num: number) {
-    if (num < 0 || num % 1 !== 0) {
+  private IsNonNaturalNumber(value: number) {
+    if (value < 0 || value % 1 !== 0) {
       return true;
     }
     return false;
-  }
-
-  private IsNullOrUndefined(obj: unknown) {
-    return obj === undefined || obj === null;
   }
 
   private mapException(err: Error) {

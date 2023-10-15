@@ -2,7 +2,7 @@ import { TaskResult } from "azure-pipelines-task-lib";
 import { TaskRunIssue } from "./task-run-issue";
 import { TaskRunLog } from "./task-run-log";
 
-export class TaskRun {
+export interface TaskRun {
   taskId: string;
   taskName: string;
   buildId: string;

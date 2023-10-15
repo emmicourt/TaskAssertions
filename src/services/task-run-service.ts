@@ -42,13 +42,16 @@ export class TaskRunService implements ITaskRunService {
         projectName,
         parseInt(buildId)
       );
+      
       const taskRecord = this.getTaskTimelineRecord(
         buildTimeline,
         jobId,
         taskId
       );
 
-      this.validateTaskRun(taskRecord);
+      if (!taskRecord) {
+        throw new TaskRunNotFoundError();
+      }
 
       return this.mapTimelineToTaskRun(taskRecord, buildId);
     } catch (err) {
@@ -62,11 +65,11 @@ export class TaskRunService implements ITaskRunService {
     taskId: string
   ): TimelineRecord | undefined {
     const record = timeline.records
-      .filter((record) => record.parentId === jobId)
+      ?.filter((record) => record.parentId === jobId)
       .filter((record) => record.type === "Task")
-      .filter((record) => record.task.id === taskId);
+      .filter((record) => record.task?.id === taskId);
 
-    return record[0];
+    return record?.[0];
   }
 
   private mapTimelineToTaskRun(
@@ -74,30 +77,20 @@ export class TaskRunService implements ITaskRunService {
     buildId: string
   ): TaskRun | undefined {
     return {
-      taskId: timelineRecord.task.id,
-      taskName: timelineRecord.task.name,
+      taskId: timelineRecord.task?.id ?? '',
+      taskName: timelineRecord.task?.name ?? '',
       buildId: buildId,
-      jobId: timelineRecord.parentId,
-      errorCount: timelineRecord.errorCount,
-      warningCount: timelineRecord.warningCount,
+      jobId: timelineRecord.parentId ?? '',
+      errorCount: timelineRecord.errorCount ?? 0,
+      warningCount: timelineRecord.warningCount ?? 0,
     };
-  }
-
-  private validateTaskRun(timelineRecord: TimelineRecord): void {
-    if (this.IsNullOrUndefined(timelineRecord)) {
-      throw new TaskRunNotFoundError();
-    }
-  }
-
-  private IsNullOrUndefined(obj: unknown) {
-    return obj === undefined || obj === null;
   }
 
   private validateInputParameters(
     inputs: [
       parameterName: string,
-      parameterValue: unknown,
-      rule: (value: unknown) => boolean
+      parameterValue: string,
+      rule: (value: string) => boolean
     ][]
   ): void {
     inputs.forEach(([name, value, rule]) => {
