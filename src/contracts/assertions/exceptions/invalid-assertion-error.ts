@@ -3,6 +3,5 @@ export class InvalidAssertionError extends Error {
     super(
       `Invalid Assertion. Parameter name ${parameterName} Parameter value: ${value}`
     );
-    this.name = InvalidAssertionError.name;
   }
 }

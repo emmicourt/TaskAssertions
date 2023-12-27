@@ -11,6 +11,7 @@ import { NullAssertionError } from "../contracts/assertions/exceptions/null-asse
 import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run-not-found-error";
 import { TaskRun } from "../contracts/task-runs/task-run";
 import { ITaskRunService } from "../services/task-run-service";
+import tl = require("azure-pipelines-task-lib/task");
 
 export interface IAssertionValidationOrchestrator {
   checkAssertions(assertion: Assertion): Promise<AssertionValidationReport | undefined>;
@@ -86,58 +87,49 @@ export class AssertionValidationOrchestrator
     if (!assertion) {
       throw new NullAssertionError();
     }
-    this.validate([
-      ["taskId", assertion.taskId, IsNullOrWhitespace],
-      ["jobId", assertion.jobId, IsNullOrWhitespace],
-      ["buildId", assertion.buildId, IsNullOrWhitespace],
-      ["projectName", assertion.projectName, IsNullOrWhitespace],
-      [
-        "expectedErrorCount",
-        assertion.expectedErrorCount,
-        this.IsNonNaturalNumber,
-      ],
-      [
-        "expectedWarningCount",
-        assertion.expectedWarningCount,
-        this.IsNonNaturalNumber,
-      ],
-      [
-        "expectedTaskResult",
-        assertion.expectedTaskResult,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (object: any) => !object,
-      ],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ["expectedMessages", assertion.expectedMessages, (object: any) => !object],
-    ]);
+
+    if(IsNullOrWhitespace(assertion.taskId)){
+      throw new InvalidAssertionError("taskId", assertion.taskId);
+    }
+    if(IsNullOrWhitespace(assertion.jobId)){
+      throw new InvalidAssertionError("jobId", assertion.jobId);
+    }
+    if(IsNullOrWhitespace(assertion.projectName)){
+      throw new InvalidAssertionError("projectName", assertion.projectName);
+    }
+    if(this.IsNonNaturalNumber(assertion.expectedErrorCount)){
+      throw new InvalidAssertionError("expectedErrorCount", assertion.expectedErrorCount);
+    }
+    if(this.IsNonNaturalNumber(assertion.expectedWarningCount)){
+      throw new InvalidAssertionError("expectedWarningCount", assertion.expectedWarningCount);
+    }
+    if(Object.keys(tl.TaskResult).indexOf(assertion.expectedTaskResult.toString()) === -1){
+      throw new InvalidAssertionError("expectedTaskResult", assertion.expectedTaskResult);
+    }
+    if(!assertion.expectedMessages){
+      throw new InvalidAssertionError("expectedMessages", assertion.expectedMessages)
+    }
   }
 
-  private validate(
-    inputs: [
-      parameterName: string,
-      parameterValue: string | number | string[],
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      rule: (value: any) => boolean
-    ][]
-  ): void {
-    inputs.forEach(([name, value, rule]) => {
-      if (rule(value)) {
-        throw new InvalidAssertionError(name, value);
-      }
-    });
-  }
-
-  private IsNonNaturalNumber(value: number) {
+  private IsNonNaturalNumber(value: number):boolean{
     if (value < 0 || value % 1 !== 0) {
       return true;
     }
     return false;
   }
 
-  private mapException(err: Error) {
-    switch (err.name) {
-      case InvalidAssertionError.name:
-      case NullAssertionError.name:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private IsValidEnum(value: any, enumType: any):boolean{
+    if(value in enumType ){
+      return true;
+    }
+    return false;
+  }
+
+  private mapException(err: Error): void {
+    switch (true) {
+      case err instanceof InvalidAssertionError:
+      case err instanceof NullAssertionError:
         throw new AssertionValidationError(err);
       default:
         throw new AssertionValidationOrchestratorError(err);

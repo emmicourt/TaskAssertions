@@ -101,9 +101,9 @@ export class TaskRunService implements ITaskRunService {
   }
 
   private mapException(err: Error) {
-    switch (err.name) {
-      case TaskRunServiceValidationError.name:
-      case TaskRunNotFoundError.name:
+    switch (true) {
+      case err instanceof TaskRunServiceValidationError:
+      case err instanceof TaskRunNotFoundError:
         throw err;
       default:
         throw new TaskRunServiceError(err);
