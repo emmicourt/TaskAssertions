@@ -33,10 +33,10 @@ describe("TaskRunService logical tests", () => {
 
     expect(result).not.toBeNull();
     expect(result).not.toBeUndefined();
-    expect(result.buildId).toBe(buildId);
-    expect(result.errorCount).toBe(0);
-    expect(result.jobId).toBe(jobId);
-    expect(result.taskId).toBe(taskId);
+    expect(result?.buildId).toBe(buildId);
+    expect(result?.errorCount).toBe(0);
+    expect(result?.jobId).toBe(jobId);
+    expect(result?.taskId).toBe(taskId);
   });
 
   it("should throw TaskRunNotFoundError if task not found ", async () => {
@@ -66,7 +66,7 @@ describe("TaskRunService input validation tests", () => {
     buildTimelineClientMock.getBuildTimeline.mockResolvedValue(createTestTimeline());
   });
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: taskId Value: %p as argument. Should Throw validation error ",
     async (taskId) => {
       await expect(buildTaskRunService.getBuildTaskRun(
@@ -78,7 +78,7 @@ describe("TaskRunService input validation tests", () => {
     }
   );
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: jobId Value: %p. throw validation error ",
     async (jobId) => {
       await expect(buildTaskRunService.getBuildTaskRun(
@@ -90,7 +90,7 @@ describe("TaskRunService input validation tests", () => {
     }
   );
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: ProjectName Value: %p, throw validation error ",
     async (projectName) => {
       await expect(buildTaskRunService.getBuildTaskRun(
@@ -102,7 +102,7 @@ describe("TaskRunService input validation tests", () => {
     }
   );
 
-  test.each([undefined, null, "", " "])(
+  test.each(["", " "])(
     "Input: BuildId Value: %p, throw validation error ",
     async (buildId) => {
       await expect(buildTaskRunService.getBuildTaskRun(

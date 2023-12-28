@@ -3,7 +3,7 @@ export enum AssertionValidationResult {
   Failed,
 }
 
-export class AssertionValidationReport {
+export interface AssertionValidationReport {
   taskId: string;
   taskName: string;
   result: AssertionValidationResult;

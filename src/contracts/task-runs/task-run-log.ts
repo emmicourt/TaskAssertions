@@ -1,4 +1,4 @@
-export class TaskRunLog {
+export interface TaskRunLog {
   logId: string;
   logUrl: string;
 }

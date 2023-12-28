@@ -1,6 +1,6 @@
 import tl = require("azure-pipelines-task-lib/task");
 
-export class Assertion {
+export interface Assertion {
   taskId: string;
   projectName: string;
   jobId: string;

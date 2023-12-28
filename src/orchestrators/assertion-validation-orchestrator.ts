@@ -8,11 +8,13 @@ import { AssertionValidationError } from "../contracts/assertions/exceptions/ass
 import { AssertionValidationOrchestratorError } from "../contracts/assertions/exceptions/assertion-validation-orchestrator-error";
 import { InvalidAssertionError } from "../contracts/assertions/exceptions/invalid-assertion-error";
 import { NullAssertionError } from "../contracts/assertions/exceptions/null-assertion-error";
+import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run-not-found-error";
 import { TaskRun } from "../contracts/task-runs/task-run";
 import { ITaskRunService } from "../services/task-run-service";
+import tl = require("azure-pipelines-task-lib/task");
 
 export interface IAssertionValidationOrchestrator {
-  checkAssertions(assertion: Assertion): Promise<AssertionValidationReport>;
+  checkAssertions(assertion: Assertion): Promise<AssertionValidationReport | undefined>;
 }
 
 export class AssertionValidationOrchestrator
@@ -26,7 +28,7 @@ export class AssertionValidationOrchestrator
 
   public async checkAssertions(
     assertion: Assertion
-  ): Promise<AssertionValidationReport> {
+  ): Promise<AssertionValidationReport | undefined> {
     try {
       this.validateAssertion(assertion);
 
@@ -36,6 +38,10 @@ export class AssertionValidationOrchestrator
         assertion.jobId,
         assertion.taskId
       );
+
+      if(!taskRun){
+        throw new TaskRunNotFoundError();
+      }
 
       return this.createTaskValidationResult(assertion, taskRun);
     } catch (err) {
@@ -78,62 +84,44 @@ export class AssertionValidationOrchestrator
   }
 
   private validateAssertion(assertion: Assertion): void {
-    if (this.IsNullOrUndefined(assertion)) {
+    if (!assertion) {
       throw new NullAssertionError();
     }
-    this.validate([
-      ["taskId", assertion.taskId, IsNullOrWhitespace],
-      ["jobId", assertion.jobId, IsNullOrWhitespace],
-      ["buildId", assertion.buildId, IsNullOrWhitespace],
-      ["projectName", assertion.projectName, IsNullOrWhitespace],
-      [
-        "expectedErrorCount",
-        assertion.expectedErrorCount,
-        this.IsNonNaturalNumber,
-      ],
-      [
-        "expectedWarningCount",
-        assertion.expectedWarningCount,
-        this.IsNonNaturalNumber,
-      ],
-      [
-        "expectedTaskResult",
-        assertion.expectedTaskResult,
-        this.IsNullOrUndefined,
-      ],
-      ["expectedMessages", assertion.expectedMessages, this.IsNullOrUndefined],
-    ]);
+
+    if(IsNullOrWhitespace(assertion.taskId)){
+      throw new InvalidAssertionError("taskId", assertion.taskId);
+    } else if(IsNullOrWhitespace(assertion.jobId)){
+      throw new InvalidAssertionError("jobId", assertion.jobId);
+    } else if(IsNullOrWhitespace(assertion.buildId)){
+      throw new InvalidAssertionError("buildId", assertion.buildId);
+    } else if(IsNullOrWhitespace(assertion.projectName)){
+      throw new InvalidAssertionError("projectName", assertion.projectName);
+    } else if(this.IsNonNaturalNumber(assertion.expectedErrorCount)){
+      throw new InvalidAssertionError("expectedErrorCount", assertion.expectedErrorCount);
+    } else if(this.IsNonNaturalNumber(assertion.expectedWarningCount)){
+      throw new InvalidAssertionError("expectedWarningCount", assertion.expectedWarningCount);
+    } else if(this.IsValidEnum(assertion.expectedTaskResult)){
+      throw new InvalidAssertionError("expectedTaskResult", assertion.expectedTaskResult);
+    } else if(!assertion.expectedMessages){
+      throw new InvalidAssertionError("expectedMessages", assertion.expectedMessages)
+    }
   }
 
-  private validate(
-    inputs: [
-      parameterName: string,
-      parameterValue: unknown,
-      rule: (value: unknown) => boolean
-    ][]
-  ): void {
-    inputs.forEach(([name, value, rule]) => {
-      if (rule(value)) {
-        throw new InvalidAssertionError(name, value);
-      }
-    });
-  }
-
-  private IsNonNaturalNumber(num: number) {
-    if (num < 0 || num % 1 !== 0) {
+  private IsNonNaturalNumber(value: number):boolean{
+    if (value < 0 || value % 1 !== 0) {
       return true;
     }
     return false;
   }
 
-  private IsNullOrUndefined(obj: unknown) {
-    return obj === undefined || obj === null;
+  private IsValidEnum(taskResult : tl.TaskResult):boolean{
+    return Object.keys(tl.TaskResult).indexOf(taskResult.toString()) === -1
   }
 
-  private mapException(err: Error) {
-    switch (err.name) {
-      case InvalidAssertionError.name:
-      case NullAssertionError.name:
+  private mapException(err: Error): void {
+    switch (true) {
+      case err instanceof InvalidAssertionError:
+      case err instanceof NullAssertionError:
         throw new AssertionValidationError(err);
       default:
         throw new AssertionValidationOrchestratorError(err);
