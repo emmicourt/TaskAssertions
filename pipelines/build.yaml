@@ -1,0 +1,12 @@
+
+stages:
+  - stage: build
+    jobs:
+      - job: build
+        steps:
+          - script:
+            displayName: lint
+          - script:
+            displayName: build
+          - script: 
+            displayName: run tests
