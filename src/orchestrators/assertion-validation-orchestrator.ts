@@ -90,23 +90,19 @@ export class AssertionValidationOrchestrator
 
     if(IsNullOrWhitespace(assertion.taskId)){
       throw new InvalidAssertionError("taskId", assertion.taskId);
-    }
-    if(IsNullOrWhitespace(assertion.jobId)){
+    } else if(IsNullOrWhitespace(assertion.jobId)){
       throw new InvalidAssertionError("jobId", assertion.jobId);
-    }
-    if(IsNullOrWhitespace(assertion.projectName)){
+    } else if(IsNullOrWhitespace(assertion.buildId)){
+      throw new InvalidAssertionError("buildId", assertion.buildId);
+    } else if(IsNullOrWhitespace(assertion.projectName)){
       throw new InvalidAssertionError("projectName", assertion.projectName);
-    }
-    if(this.IsNonNaturalNumber(assertion.expectedErrorCount)){
+    } else if(this.IsNonNaturalNumber(assertion.expectedErrorCount)){
       throw new InvalidAssertionError("expectedErrorCount", assertion.expectedErrorCount);
-    }
-    if(this.IsNonNaturalNumber(assertion.expectedWarningCount)){
+    } else if(this.IsNonNaturalNumber(assertion.expectedWarningCount)){
       throw new InvalidAssertionError("expectedWarningCount", assertion.expectedWarningCount);
-    }
-    if(Object.keys(tl.TaskResult).indexOf(assertion.expectedTaskResult.toString()) === -1){
+    } else if(this.IsValidEnum(assertion.expectedTaskResult)){
       throw new InvalidAssertionError("expectedTaskResult", assertion.expectedTaskResult);
-    }
-    if(!assertion.expectedMessages){
+    } else if(!assertion.expectedMessages){
       throw new InvalidAssertionError("expectedMessages", assertion.expectedMessages)
     }
   }
@@ -118,12 +114,8 @@ export class AssertionValidationOrchestrator
     return false;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private IsValidEnum(value: any, enumType: any):boolean{
-    if(value in enumType ){
-      return true;
-    }
-    return false;
+  private IsValidEnum(taskResult : tl.TaskResult):boolean{
+    return Object.keys(tl.TaskResult).indexOf(taskResult.toString()) === -1
   }
 
   private mapException(err: Error): void {

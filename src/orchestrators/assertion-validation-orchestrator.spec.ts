@@ -176,14 +176,14 @@ describe("AssertionValidationOrchestrator exception tests", () => {
     taskRunServiceMock.getBuildTaskRun.mockResolvedValue(createTaskRun());
   });
 
-  it("TaskServiceFailure should throw AssertionValidation error", async () => {
+  it("TaskServiceFailure should throw AssertionValidationOrchestrator error", async () => {
     taskRunServiceMock.getBuildTaskRun.mockImplementation(() => {
       throw Error();
     });
 
     await expect(taskValidationOrchestrator
       .checkAssertions(createAssertion())).rejects
-      .toThrowError(new AssertionValidationError(new Error()));
+      .toThrowError(new AssertionValidationOrchestratorError(new Error()));
   });
 });
 
