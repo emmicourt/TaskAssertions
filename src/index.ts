@@ -79,12 +79,14 @@ async function initialize(taskConfig : TaskConfig): Promise<AssertionValidationO
   const token = taskConfig.getSystemAccessToken();
 
   if(!adoUrl || !token){
-    throw new Error();
+    throw new Error("Task failed to locate Azure DevOps url and create a token.");
   }
 
   const buildTimelineClientFactory = new BuildTimelineClientFactory();
+  
   const buildTimelineClient =
     await buildTimelineClientFactory.getBuildTimelineClient(adoUrl, token);
+
   const taskRunService = new TaskRunService(buildTimelineClient);
   return new AssertionValidationOrchestrator(taskRunService);
 }
