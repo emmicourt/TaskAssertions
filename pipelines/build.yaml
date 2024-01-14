@@ -1,4 +1,5 @@
 
+pool: local
 stages:
   - stage: build
     displayName: Build
