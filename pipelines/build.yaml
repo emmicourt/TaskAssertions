@@ -12,3 +12,5 @@ stages:
             displayName: build
           - script: npm run test
             displayName: run tests
+          - script: npm run pack
+            displayName: pack
