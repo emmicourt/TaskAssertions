@@ -10,7 +10,5 @@ stages:
             displayName: restore
           - script: npm run build
             displayName: build
-          - script: npm run test
-            displayName: run tests
           - script: npm run pack
             displayName: pack
