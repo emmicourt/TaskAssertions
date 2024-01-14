@@ -17,7 +17,7 @@ const taskValidationOrchestrator = new AssertionValidationOrchestrator(
 describe("AssertionValidationOrchestrator logical tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    taskRunServiceMock.getBuildTaskRun.mockResolvedValue(createTaskRun()); 
+    taskRunServiceMock.getBuildTaskRun.mockResolvedValue(createTaskRun());
   });
 
   it("should return success validation if assertion is true", async () => {
@@ -95,7 +95,7 @@ describe("AssertionValidationOrchestrator logical tests", () => {
 describe("AssertionValidationOrchestrator validation tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    taskRunServiceMock.getBuildTaskRun.mockResolvedValue(createTaskRun()); 
+    taskRunServiceMock.getBuildTaskRun.mockResolvedValue(createTaskRun());
   });
 
   test.each(["", " "])(
@@ -103,10 +103,13 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     async (taskId) => {
       const assertion: Assertion = createAssertion();
       assertion.taskId = taskId;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new InvalidAssertionError("taskId", taskId)));
+      await expect(
+        taskValidationOrchestrator.checkAssertions(assertion)
+      ).rejects.toThrowError(
+        new AssertionValidationError(
+          new InvalidAssertionError("taskId", taskId)
+        )
+      );
     }
   );
 
@@ -115,10 +118,11 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     async (jobId) => {
       const assertion: Assertion = createAssertion();
       assertion.jobId = jobId;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new InvalidAssertionError("jobId", jobId)));
+      await expect(
+        taskValidationOrchestrator.checkAssertions(assertion)
+      ).rejects.toThrowError(
+        new AssertionValidationError(new InvalidAssertionError("jobId", jobId))
+      );
     }
   );
 
@@ -127,10 +131,13 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     async (projectName) => {
       const assertion: Assertion = createAssertion();
       assertion.projectName = projectName;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new InvalidAssertionError("projectName", projectName)));
+      await expect(
+        taskValidationOrchestrator.checkAssertions(assertion)
+      ).rejects.toThrowError(
+        new AssertionValidationError(
+          new InvalidAssertionError("projectName", projectName)
+        )
+      );
     }
   );
 
@@ -139,10 +146,13 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     async (buildId) => {
       const assertion: Assertion = createAssertion();
       assertion.buildId = buildId;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new InvalidAssertionError("buildId", buildId)));
+      await expect(
+        taskValidationOrchestrator.checkAssertions(assertion)
+      ).rejects.toThrowError(
+        new AssertionValidationError(
+          new InvalidAssertionError("buildId", buildId)
+        )
+      );
     }
   );
 
@@ -151,9 +161,9 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     async (expectedErrorCount) => {
       const assertion: Assertion = createAssertion();
       assertion.expectedErrorCount = expectedErrorCount;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(AssertionValidationError);
+      await expect(
+        taskValidationOrchestrator.checkAssertions(assertion)
+      ).rejects.toThrowError(AssertionValidationError);
     }
   );
 
@@ -162,10 +172,16 @@ describe("AssertionValidationOrchestrator validation tests", () => {
     async (expectedWarningCount) => {
       const assertion: Assertion = createAssertion();
       assertion.expectedWarningCount = expectedWarningCount;
-      await expect(taskValidationOrchestrator
-        .checkAssertions(assertion)).rejects
-        .toThrowError(new AssertionValidationError(
-          new InvalidAssertionError("expectedWarningCount", expectedWarningCount)));
+      await expect(
+        taskValidationOrchestrator.checkAssertions(assertion)
+      ).rejects.toThrowError(
+        new AssertionValidationError(
+          new InvalidAssertionError(
+            "expectedWarningCount",
+            expectedWarningCount
+          )
+        )
+      );
     }
   );
 });
@@ -181,9 +197,11 @@ describe("AssertionValidationOrchestrator exception tests", () => {
       throw Error();
     });
 
-    await expect(taskValidationOrchestrator
-      .checkAssertions(createAssertion())).rejects
-      .toThrowError(new AssertionValidationOrchestratorError(new Error()));
+    await expect(
+      taskValidationOrchestrator.checkAssertions(createAssertion())
+    ).rejects.toThrowError(
+      new AssertionValidationOrchestratorError(new Error())
+    );
   });
 });
 

@@ -1,4 +1,4 @@
-import { IsNullOrWhitespace } from "../common/string-utils";
+import { IsNullOrWhitespace } from "../utils/string-utils";
 import {
   AssertionValidationReport,
   AssertionValidationResult,
@@ -14,7 +14,9 @@ import { ITaskRunService } from "../services/task-run-service";
 import tl = require("azure-pipelines-task-lib/task");
 
 export interface IAssertionValidationOrchestrator {
-  checkAssertions(assertion: Assertion): Promise<AssertionValidationReport | undefined>;
+  checkAssertions(
+    assertion: Assertion
+  ): Promise<AssertionValidationReport | undefined>;
 }
 
 export class AssertionValidationOrchestrator
@@ -39,7 +41,7 @@ export class AssertionValidationOrchestrator
         assertion.taskId
       );
 
-      if(!taskRun){
+      if (!taskRun) {
         throw new TaskRunNotFoundError();
       }
 
@@ -88,34 +90,46 @@ export class AssertionValidationOrchestrator
       throw new NullAssertionError();
     }
 
-    if(IsNullOrWhitespace(assertion.taskId)){
+    if (IsNullOrWhitespace(assertion.taskId)) {
       throw new InvalidAssertionError("taskId", assertion.taskId);
-    } else if(IsNullOrWhitespace(assertion.jobId)){
+    } else if (IsNullOrWhitespace(assertion.jobId)) {
       throw new InvalidAssertionError("jobId", assertion.jobId);
-    } else if(IsNullOrWhitespace(assertion.buildId)){
+    } else if (IsNullOrWhitespace(assertion.buildId)) {
       throw new InvalidAssertionError("buildId", assertion.buildId);
-    } else if(IsNullOrWhitespace(assertion.projectName)){
+    } else if (IsNullOrWhitespace(assertion.projectName)) {
       throw new InvalidAssertionError("projectName", assertion.projectName);
-    } else if(this.IsNonNaturalNumber(assertion.expectedErrorCount)){
-      throw new InvalidAssertionError("expectedErrorCount", assertion.expectedErrorCount);
-    } else if(this.IsNonNaturalNumber(assertion.expectedWarningCount)){
-      throw new InvalidAssertionError("expectedWarningCount", assertion.expectedWarningCount);
-    } else if(this.IsValidEnum(assertion.expectedTaskResult)){
-      throw new InvalidAssertionError("expectedTaskResult", assertion.expectedTaskResult);
-    } else if(!assertion.expectedMessages){
-      throw new InvalidAssertionError("expectedMessages", assertion.expectedMessages)
+    } else if (this.IsNonNaturalNumber(assertion.expectedErrorCount)) {
+      throw new InvalidAssertionError(
+        "expectedErrorCount",
+        assertion.expectedErrorCount
+      );
+    } else if (this.IsNonNaturalNumber(assertion.expectedWarningCount)) {
+      throw new InvalidAssertionError(
+        "expectedWarningCount",
+        assertion.expectedWarningCount
+      );
+    } else if (this.IsValidEnum(assertion.expectedTaskResult)) {
+      throw new InvalidAssertionError(
+        "expectedTaskResult",
+        assertion.expectedTaskResult
+      );
+    } else if (!assertion.expectedMessages) {
+      throw new InvalidAssertionError(
+        "expectedMessages",
+        assertion.expectedMessages
+      );
     }
   }
 
-  private IsNonNaturalNumber(value: number):boolean{
+  private IsNonNaturalNumber(value: number): boolean {
     if (value < 0 || value % 1 !== 0) {
       return true;
     }
     return false;
   }
 
-  private IsValidEnum(taskResult : tl.TaskResult):boolean{
-    return Object.keys(tl.TaskResult).indexOf(taskResult.toString()) === -1
+  private IsValidEnum(taskResult: tl.TaskResult): boolean {
+    return Object.keys(tl.TaskResult).indexOf(taskResult.toString()) === -1;
   }
 
   private mapException(err: Error): void {
