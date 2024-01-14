@@ -6,6 +6,8 @@ stages:
     jobs:
       - job: build
         steps:
+          - script: npm ci
+            displayName: restore
           - script: npm run build
             displayName: build
           - script: npm run test
