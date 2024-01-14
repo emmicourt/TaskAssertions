@@ -7,7 +7,7 @@ import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-
 import { TaskRunServiceValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
 import { TaskRunService } from "./task-run-service";
 import { BuildTimelineClient } from "../clients/build-timeline-client";
-import { mock } from 'jest-mock-extended';
+import { mock } from "jest-mock-extended";
 
 const jobId = "someJobId";
 const taskId = "someTaskId";
@@ -20,7 +20,9 @@ const buildTaskRunService = new TaskRunService(buildTimelineClientMock);
 describe("TaskRunService logical tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(createTestTimeline());
+    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(
+      createTestTimeline()
+    );
   });
 
   it("should get build task run", async () => {
@@ -41,76 +43,60 @@ describe("TaskRunService logical tests", () => {
 
   it("should throw TaskRunNotFoundError if task not found ", async () => {
     const otherTaskId = "someOtherTaskId";
-    await expect(buildTaskRunService.getBuildTaskRun(
-      project,
-      buildId,
-      jobId,
-      otherTaskId
-    )).rejects.toThrowError(TaskRunNotFoundError);
+    await expect(
+      buildTaskRunService.getBuildTaskRun(project, buildId, jobId, otherTaskId)
+    ).rejects.toThrowError(TaskRunNotFoundError);
   });
 
   it("should return TaskRunNotFoundError if job not found ", async () => {
     const otherJobId = "someOtherJobId";
-    await expect(buildTaskRunService.getBuildTaskRun(
-      project,
-      buildId,
-      otherJobId,
-      taskId
-    )).rejects.toThrowError(TaskRunNotFoundError);
+    await expect(
+      buildTaskRunService.getBuildTaskRun(project, buildId, otherJobId, taskId)
+    ).rejects.toThrowError(TaskRunNotFoundError);
   });
 });
 
 describe("TaskRunService input validation tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(createTestTimeline());
+    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(
+      createTestTimeline()
+    );
   });
 
   test.each(["", " "])(
     "Input: taskId Value: %p as argument. Should Throw validation error ",
     async (taskId) => {
-      await expect(buildTaskRunService.getBuildTaskRun(
-        project,
-        buildId,
-        jobId,
-        taskId
-      )).rejects.toThrowError(TaskRunServiceValidationError);
+      await expect(
+        buildTaskRunService.getBuildTaskRun(project, buildId, jobId, taskId)
+      ).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 
   test.each(["", " "])(
     "Input: jobId Value: %p. throw validation error ",
     async (jobId) => {
-      await expect(buildTaskRunService.getBuildTaskRun(
-        project,
-        buildId,
-        jobId,
-        taskId
-      )).rejects.toThrowError(TaskRunServiceValidationError);
+      await expect(
+        buildTaskRunService.getBuildTaskRun(project, buildId, jobId, taskId)
+      ).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 
   test.each(["", " "])(
     "Input: ProjectName Value: %p, throw validation error ",
     async (projectName) => {
-      await expect(buildTaskRunService.getBuildTaskRun(
-        projectName,
-        buildId,
-        jobId,
-        taskId
-      )).rejects.toThrowError(TaskRunServiceValidationError);
+      await expect(
+        buildTaskRunService.getBuildTaskRun(projectName, buildId, jobId, taskId)
+      ).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 
   test.each(["", " "])(
     "Input: BuildId Value: %p, throw validation error ",
     async (buildId) => {
-      await expect(buildTaskRunService.getBuildTaskRun(
-        project,
-        buildId,
-        jobId,
-        taskId
-      )).rejects.toThrowError(TaskRunServiceValidationError);
+      await expect(
+        buildTaskRunService.getBuildTaskRun(project, buildId, jobId, taskId)
+      ).rejects.toThrowError(TaskRunServiceValidationError);
     }
   );
 });
@@ -118,19 +104,18 @@ describe("TaskRunService input validation tests", () => {
 describe("TaskRunService exception tests", () => {
   afterEach(() => {
     jest.clearAllMocks();
-    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(createTestTimeline());
+    buildTimelineClientMock.getBuildTimeline.mockResolvedValue(
+      createTestTimeline()
+    );
   });
 
   it("should throw error if client returns error", async () => {
     buildTimelineClientMock.getBuildTimeline.mockImplementation(() => {
       throw Error();
     });
-    await expect(buildTaskRunService.getBuildTaskRun(
-      project,
-      buildId,
-      jobId,
-      taskId
-    )).rejects.toThrowError(TaskRunServiceError);
+    await expect(
+      buildTaskRunService.getBuildTaskRun(project, buildId, jobId, taskId)
+    ).rejects.toThrowError(TaskRunServiceError);
   });
 });
 
