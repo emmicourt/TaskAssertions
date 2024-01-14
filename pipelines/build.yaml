@@ -1,12 +1,11 @@
 
 stages:
   - stage: build
+    displayName: Build
     jobs:
       - job: build
         steps:
-          - script:
-            displayName: lint
-          - script:
+          - script: npm run build
             displayName: build
-          - script: 
+          - script: npm run test
             displayName: run tests
