@@ -1,30 +1,22 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable no-undef */
-// Generated using webpack-cli https://github.com/webpack/webpack-cli
 
 const path = require("path");
-
-//const isProduction = process.env.NODE_ENV == "production";
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: "./src/index.ts",
-  devtool: "inline-source-map",
   target: "node",
-  node: {
-    __dirname: false,
-    __filename: false
-
-  },
   module: {
     rules: [
       {
         test: /azure-pipelines-task-lib[/\\]internal\.js$/,
-        loader: 'string-replace-loader',
+        loader: "string-replace-loader",
         options: {
-          search: 'require[(]([^\'"])',
-          replace: '__non_webpack_require__($1',
-          flags: 'g'
-        }
+          search: "require[(]([^'\"])",
+          replace: "__non_webpack_require__($1",
+          flags: "g",
+        },
       },
       {
         test: /\.(ts|tsx)$/i,
@@ -34,10 +26,14 @@ module.exports = {
     ],
   },
   output: {
-    filename: 'index.js',
+    filename: "index.js",
     path: path.resolve(__dirname, "dist"),
   },
-  plugins: [],
+  plugins: [
+    new CopyPlugin({
+      patterns: [{ from: "ado-extension-configs" }],
+    }),
+  ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
   },

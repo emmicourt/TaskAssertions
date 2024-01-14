@@ -14,7 +14,7 @@ export class BuildTimelineClient implements IBuildTimelineClient {
 
   public async getBuildTimeline(
     project: string,
-    buildId: number,
+    buildId: number
   ): Promise<Timeline> {
     return await this.buildApi.getBuildTimeline(project, buildId);
   }

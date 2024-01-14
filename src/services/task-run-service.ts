@@ -3,7 +3,7 @@ import {
   TimelineRecord,
 } from "azure-devops-node-api/interfaces/BuildInterfaces";
 import { IBuildTimelineClient } from "../clients/build-timeline-client";
-import { IsNullOrWhitespace } from "../common/string-utils";
+import { IsNullOrWhitespace } from "../utils/string-utils";
 import { TaskRunNotFoundError } from "../contracts/task-runs/exceptions/task-run-not-found-error";
 import { TaskRunServiceError } from "../contracts/task-runs/exceptions/task-run-service-error";
 import { TaskRunServiceValidationError } from "../contracts/task-runs/exceptions/task-run-service-input-validation-error";
@@ -42,7 +42,7 @@ export class TaskRunService implements ITaskRunService {
         projectName,
         parseInt(buildId)
       );
-      
+
       const taskRecord = this.getTaskTimelineRecord(
         buildTimeline,
         jobId,
@@ -77,10 +77,10 @@ export class TaskRunService implements ITaskRunService {
     buildId: string
   ): TaskRun | undefined {
     return {
-      taskId: timelineRecord.task?.id ?? '',
-      taskName: timelineRecord.task?.name ?? '',
+      taskId: timelineRecord.task?.id ?? "",
+      taskName: timelineRecord.task?.name ?? "",
       buildId: buildId,
-      jobId: timelineRecord.parentId ?? '',
+      jobId: timelineRecord.parentId ?? "",
       errorCount: timelineRecord.errorCount ?? 0,
       warningCount: timelineRecord.warningCount ?? 0,
     };
