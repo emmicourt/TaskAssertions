@@ -1,29 +1,29 @@
 import tl = require("azure-pipelines-task-lib/task");
+import process from "node:process";
 
-const projectNameString = "SYSTEM_TEAMPROJECT";
-const buildId = "BUILD_BUILDID";
-const jobId = "SYSTEM_JOBID";
-const systemAccess = "SYSTEM_ACCESSTOKEN";
-const adoUrl = "SYSTEM_COLLECTIONURI";
+export class EnvUtil {
 
-export class TaskConfig {
   public getProjectName(): string | undefined {
-    return tl.getVariable(projectNameString);
+    return process.env.SYSTEM_TEAMPROJECT ?? undefined; 
   }
 
   public getBuildId(): string | undefined {
-    return tl.getVariable(buildId);
+    return process.env.BUILD_BUILDID ?? undefined; 
   }
 
   public getJobId(): string | undefined {
-    return tl.getVariable(jobId);
+    return process.env.SYSTEM_JOBID ?? undefined;
   }
 
   public getSystemAccessToken(): string | undefined {
-    return tl.getVariable(systemAccess);
+    const endpoint = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false); 
+    if(endpoint){
+      return endpoint.parameters['AccessToken'] ?? undefined;
+    }
+    return undefined
   }
 
   public getAdoUrl(): string | undefined {
-    return tl.getVariable(adoUrl);
+    return process.env.SYSTEM_COLLECTIONURI ?? undefined;
   }
 }

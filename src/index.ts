@@ -1,6 +1,6 @@
 import tl = require("azure-pipelines-task-lib/task");
 import { BuildTimelineClientFactory } from "./clients/build-timeline-client-factory";
-import { TaskConfig } from "./utils/env-utils";
+import { EnvUtil } from "./utils/env-utils";
 import { AssertionValidationResult } from "./contracts/assertion-validation-results/assertion-validation-result";
 import { Assertion } from "./contracts/assertions/assertion";
 import { AssertionValidationOrchestrator } from "./orchestrators/assertion-validation-orchestrator";
@@ -9,9 +9,9 @@ import { IsNullOrWhitespace, parseEnum } from "./utils/string-utils";
 
 export async function run(): Promise<void> {
   try {
-    const taskConfig = new TaskConfig();
+    const envUtil = new EnvUtil();
     const assertionOrchestrator: AssertionValidationOrchestrator =
-      await initialize(taskConfig);
+      await initialize(envUtil);
     const taskId: string | undefined = tl.getInputRequired("taskId");
     const expectedMessages: string[] =
       tl.getInput("expectedMessage", false)?.split(";") ?? [];
@@ -36,19 +36,19 @@ export async function run(): Promise<void> {
       tl.getInput("expectedWarningCount", false) ?? "0"
     );
 
-    const jobId = taskConfig.getJobId();
+    const jobId = envUtil.getJobId();
 
     if (!jobId || IsNullOrWhitespace(jobId)) {
       throw new Error(`Invalid Input. Parameter: JobId Value: ${jobId}`);
     }
 
-    const buildId = taskConfig.getBuildId();
+    const buildId = envUtil.getBuildId();
 
     if (!buildId || IsNullOrWhitespace(buildId)) {
       throw new Error(`Invalid Input. Parameter: BuildId Value: ${buildId}`);
     }
 
-    const projectName = taskConfig.getProjectName();
+    const projectName = envUtil.getProjectName();
 
     if (!projectName || IsNullOrWhitespace(projectName)) {
       throw new Error(
@@ -82,10 +82,10 @@ export async function run(): Promise<void> {
 }
 
 async function initialize(
-  taskConfig: TaskConfig
+  envUtil: EnvUtil
 ): Promise<AssertionValidationOrchestrator> {
-  const adoUrl = taskConfig.getAdoUrl();
-  const token = taskConfig.getSystemAccessToken();
+  const adoUrl = envUtil.getAdoUrl();
+  const token = envUtil.getSystemAccessToken();
 
   if (!adoUrl || !token) {
     throw new Error(
