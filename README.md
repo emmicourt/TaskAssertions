@@ -1,3 +1,3 @@
 # TaskAssertions
 
-A custom azure dev ops task to help test and validate other tasks.
+An Azure DevOps task to help test and validate other tasks.
