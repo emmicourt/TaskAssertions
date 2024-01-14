@@ -1,0 +1,11 @@
+
+stages:
+  - stage: build
+    displayName: Build
+    jobs:
+      - job: build
+        steps:
+          - script: npm run build
+            displayName: build
+          - script: npm run test
+            displayName: run tests
