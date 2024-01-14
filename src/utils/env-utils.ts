@@ -1,10 +1,10 @@
 import tl = require("azure-pipelines-task-lib/task");
 
-const projectNameString = "System.TeamProject";
-const buildId = "Build.BuildId";
-const jobId = "System.JobId";
-const systemAccess = "System.AccessToken";
-const adoUrl = "System.CollectionUri";
+const projectNameString = "SYSTEM_TEAMPROJECT";
+const buildId = "BUILD_BUILDID";
+const jobId = "SYSTEM_JOBID";
+const systemAccess = "SYSTEM_ACCESSTOKEN";
+const adoUrl = "SYSTEM_COLLECTIONURI";
 
 export class TaskConfig {
   public getProjectName(): string | undefined {
