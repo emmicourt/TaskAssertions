@@ -85,11 +85,14 @@ async function initialize(
   envUtil: EnvUtil
 ): Promise<AssertionValidationOrchestrator> {
   const adoUrl = envUtil.getAdoUrl();
-  const token = envUtil.getSystemAccessToken();
+  if(!adoUrl){
+    throw new Error("Unable to locate Azure DevOps Collection Url.");
+  }
 
-  if (!adoUrl || !token) {
+  const token = envUtil.getSystemAccessToken();
+  if (!token) {
     throw new Error(
-      "Task failed to locate Azure DevOps url and create a token."
+      "Unable to create a token."
     );
   }
 

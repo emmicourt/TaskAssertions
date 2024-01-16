@@ -18,7 +18,7 @@ export class EnvUtil {
   public getSystemAccessToken(): string | undefined {
     const endpoint = tl.getEndpointAuthorization('SYSTEMVSSCONNECTION', false); 
     if(endpoint){
-      return endpoint.parameters['AccessToken'] ?? undefined;
+      return endpoint.parameters['AccessToken'];
     }
     return undefined
   }
